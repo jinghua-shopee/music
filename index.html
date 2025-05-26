@@ -10,27 +10,46 @@
         body {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             cursor: pointer;
-            overflow: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
+        /* 首页允许滚动 */
+        body.home-page {
+            overflow-y: auto;
+        }
+
+        /* 学习页面禁止滚动 */
+        body.learning-page {
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         #home {
             text-align: center;
-            padding: 32px;
-            margin-top: 64px;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .home-content {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         #learning-page {
             display: none;
-            flex: 1;
-            position: relative;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
@@ -39,10 +58,10 @@
             gap: 12px;
         }
 
-        /* 第一排：五线谱和简谱区域 (50%高度) */
+        /* 横版布局 - 默认 */
         .first-row {
             display: flex;
-            height: 50vh;
+            height: calc(60vh - 24px);
             gap: 16px;
             flex-shrink: 0;
         }
@@ -106,64 +125,26 @@
             margin-top: 20px;
         }
 
-        /* 第二排：统计和控制按钮区域 (10%高度) */
+        /* 第二排：控制按钮区域 */
         .second-row {
             display: flex;
-            height: 10vh;
-            gap: 16px;
+            height: calc(10vh - 12px);
             flex-shrink: 0;
-            align-items: center;
+            min-height: 50px;
         }
 
-        /* 统计面板 */
-        .stats-container {
-            flex: 2;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            font-size: 14px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            height: 100%;
-            box-sizing: border-box;
-        }
 
-        .stats-item {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .stats-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: #666;
-            letter-spacing: -0.08px;
-        }
-
-        #totalCount, #correctCount, #accuracyRate, #avgReactionTime {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1D1D1F;
-            letter-spacing: -0.24px;
-        }
 
         /* 控制按钮区域 */
         .buttons-section {
-            flex: 1;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
+            width: 100%;
             height: 100%;
         }
 
         .control-btn {
-            flex: 1;
             font-size: 15px;
             font-weight: 600;
             background: #007AFF;
@@ -178,6 +159,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
         }
 
         .control-btn:hover {
@@ -219,10 +217,11 @@
             background: #A50E15;
         }
 
-        /* 第三排：钢琴键盘区域 (40%高度) */
+        /* 第三排：钢琴键盘区域 */
         .third-row {
-            height: 40vh;
+            height: calc(30vh - 12px);
             flex-shrink: 0;
+            min-height: 150px;
         }
 
         .piano-container {
@@ -434,25 +433,94 @@
             letter-spacing: -0.24px;
         }
 
+        /* 横版和竖版显示控制 */
+        .landscape-only {
+            display: flex;
+        }
+        
+        .portrait-only {
+            display: none;
+        }
+        
+        .jianpu-row {
+            height: calc(25vh - 12px);
+            flex-shrink: 0;
+            min-height: 120px;
+        }
+
+        /* 竖版布局 - 高度大于宽度时 */
+        @media (orientation: portrait) {
+            .landscape-only {
+                display: none;
+            }
+            
+            .portrait-only {
+                display: flex;
+            }
+            #learning-page {
+                overflow-y: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .first-row {
+                flex-direction: column;
+                height: auto;
+                gap: 12px;
+            }
+            
+            .staff-section {
+                height: 35vh;
+                min-height: 200px;
+            }
+            
+            .jianpu-row .jianpu-section {
+                height: 100%;
+            }
+            
+            .second-row {
+                height: 8vh;
+                min-height: 60px;
+            }
+            
+            .third-row {
+                height: 32vh;
+                min-height: 200px;
+            }
+        }
+
         /* 平板端适配 */
         @media (max-width: 1024px) and (min-width: 768px) {
             #learning-page {
                 padding: 12px;
-                gap: 8px;
-                height: 100vh;
-                overflow: hidden;
+                gap: 10px;
             }
             
-            .first-row {
-                height: 42vh;
+            .control-btn {
+                font-size: 14px;
+            }
+        }
+        
+        /* 平板端竖版特殊适配 */
+        @media (max-width: 1024px) and (min-width: 768px) and (orientation: portrait) {
+            .staff-section {
+                height: 30vh;
+                min-height: 180px;
+            }
+            
+            .jianpu-row {
+                height: calc(20vh - 10px);
+                min-height: 120px;
             }
             
             .second-row {
-                height: 10vh;
+                height: 7vh;
+                min-height: 50px;
             }
             
             .third-row {
-                height: 38vh;
+                height: 30vh;
+                min-height: 180px;
             }
             
             .white-key {
@@ -518,54 +586,72 @@
         @media (max-width: 767px) {
             #learning-page {
                 padding: 8px;
-                gap: 6px;
-                height: 100vh;
-                overflow: hidden;
-            }
-            
-            .first-row {
-                flex-direction: column;
-                height: 45vh;
-                gap: 6px;
+                gap: 8px;
             }
             
             .staff-section, .jianpu-section {
-                flex: 1;
                 border-radius: 16px;
             }
             
-            .second-row {
-                flex-direction: column;
-                height: 12vh;
-                gap: 6px;
-            }
-            
-            .stats-container {
-                flex: 1;
-                padding: 6px 12px;
-                border-radius: 12px;
-            }
-            
-            .stats-label {
-                font-size: 9px;
-            }
-            
-            #totalCount, #correctCount, #accuracyRate, #avgReactionTime {
-                font-size: 14px;
-            }
-            
-            .buttons-section {
-                flex: 1;
-                gap: 6px;
-            }
-            
             .control-btn {
-                font-size: 13px;
+                font-size: 14px;
                 border-radius: 10px;
+            }
+        }
+        
+        /* 手机端横版 */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .first-row {
+                height: calc(60vh - 16px);
+            }
+            
+            .second-row {
+                height: calc(10vh - 8px);
+                min-height: 45px;
             }
             
             .third-row {
-                height: 33vh;
+                height: calc(30vh - 8px);
+                min-height: 120px;
+            }
+        }
+        
+        /* 手机端竖版 */
+        @media (max-width: 767px) and (orientation: portrait) {
+            .staff-section {
+                height: 25vh;
+                min-height: 150px;
+            }
+            
+            .jianpu-row {
+                height: calc(18vh - 8px);
+                min-height: 120px;
+            }
+            
+            .second-row {
+                height: 12vh;
+                min-height: 80px;
+            }
+            
+            .buttons-section {
+                gap: 8px;
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr 1fr;
+            }
+            
+            .third-row {
+                height: 25vh;
+                min-height: 150px;
+            }
+            
+            /* 首页手机端优化 */
+            #home {
+                padding: 16px;
+                min-height: 100vh;
+            }
+            
+            .home-content {
+                max-width: 100%;
             }
             
             .piano-container {
@@ -1204,41 +1290,49 @@
             font-size: 20px;
         }
 
-        /* 主页手机端适配 */
-        #home {
-            padding: 20px;
-            margin-top: 40px;
-        }
-        
-        .mode-cards {
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-        }
-        
-        .mode-card {
-            width: 200px;
-            padding: 20px;
-        }
-        
-        .question-options {
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-        }
-        
-        .question-option {
-            padding: 12px 16px;
-            min-width: 60px;
-        }
-        
-        .option-number {
-            font-size: 18px;
-        }
-        
-        .selection-title {
-            font-size: 18px;
-        }
+            /* 主页手机端优化 */
+            .mode-cards {
+                flex-direction: column;
+                gap: 12px;
+                align-items: center;
+            }
+            
+            .mode-card {
+                width: 100%;
+                max-width: 280px;
+                padding: 20px;
+            }
+            
+            .question-options {
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            
+            .question-option {
+                padding: 12px 16px;
+                min-width: 60px;
+                flex: 1;
+                max-width: 90px;
+            }
+            
+            .option-number {
+                font-size: 18px;
+            }
+            
+            .selection-title {
+                font-size: 18px;
+            }
+            
+            .mode-selection, .question-selection {
+                margin-bottom: 24px;
+            }
+            
+            #startBtn {
+                width: 100%;
+                max-width: 280px;
+                margin-top: 24px;
+            }
 
         /* 弹窗手机端适配 */
         .modal-content {
@@ -1304,45 +1398,47 @@
 </head>
 <body>
     <div id="home">
-        <h1 style="color: #ffffff; font-size: 34px; font-weight: 700; letter-spacing: -0.41px; margin-bottom: 32px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">五线谱简谱对照学习</h1>
-        
-        <!-- 模式选择区域 -->
-        <div class="mode-selection">
-            <h2 class="selection-title">选择学习模式</h2>
-            <div class="mode-cards">
-                <div class="mode-card" data-mode="practice">
-                    <div class="mode-icon">📚</div>
-                    <div class="mode-name">练习模式</div>
-                    <div class="mode-desc">自主练习，提升技能</div>
-                </div>
-                <div class="mode-card" data-mode="pk">
-                    <div class="mode-icon">⚔️</div>
-                    <div class="mode-name">PK模式</div>
-                    <div class="mode-desc">双人对战，竞技比拼</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 题目数量选择区域 -->
-        <div class="question-selection">
-            <h2 class="selection-title">选择题目数量</h2>
-            <div class="question-options">
-                <div class="question-option" data-count="30">
-                    <div class="option-number">30</div>
-                    <div class="option-label">道题</div>
-                </div>
-                <div class="question-option" data-count="60">
-                    <div class="option-number">60</div>
-                    <div class="option-label">道题</div>
-                </div>
-                <div class="question-option disabled" data-count="endless">
-                    <div class="option-number">∞</div>
-                    <div class="option-label">无尽模式</div>
+        <div class="home-content">
+            <h1 style="color: #ffffff; font-size: 34px; font-weight: 700; letter-spacing: -0.41px; margin-bottom: 32px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">五线谱简谱对照学习</h1>
+            
+            <!-- 模式选择区域 -->
+            <div class="mode-selection">
+                <h2 class="selection-title">选择学习模式</h2>
+                <div class="mode-cards">
+                    <div class="mode-card" data-mode="practice">
+                        <div class="mode-icon">📚</div>
+                        <div class="mode-name">练习模式</div>
+                        <div class="mode-desc">自主练习，提升技能</div>
+                    </div>
+                    <div class="mode-card" data-mode="pk">
+                        <div class="mode-icon">⚔️</div>
+                        <div class="mode-name">PK模式</div>
+                        <div class="mode-desc">双人对战，竞技比拼</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <button id="startBtn" onclick="startLearning()">开始学习</button>
+            <!-- 题目数量选择区域 -->
+            <div class="question-selection">
+                <h2 class="selection-title">选择题目数量</h2>
+                <div class="question-options">
+                    <div class="question-option" data-count="30">
+                        <div class="option-number">30</div>
+                        <div class="option-label">道题</div>
+                    </div>
+                    <div class="question-option" data-count="60">
+                        <div class="option-number">60</div>
+                        <div class="option-label">道题</div>
+                    </div>
+                    <div class="question-option disabled" data-count="endless">
+                        <div class="option-number">∞</div>
+                        <div class="option-label">无尽模式</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="startBtn" onclick="startLearning()">开始学习</button>
+        </div>
     </div>
 
     <div id="learning-page">
@@ -1352,7 +1448,7 @@
             <div class="pause-text">已暂停</div>
         </div>
         
-        <!-- 第一排：五线谱和简谱 -->
+        <!-- 第一排：五线谱和简谱（横版）/ 五线谱（竖版） -->
         <div class="first-row">
             <div class="staff-section">
                 <div class="section-title">五线谱</div>
@@ -1360,7 +1456,7 @@
                     <div id="staff"></div>
                 </div>
             </div>
-            <div class="jianpu-section">
+            <div class="jianpu-section landscape-only">
                 <div class="section-title">简谱</div>
                 <div class="section-content">
                     <div id="jianpu"></div>
@@ -1368,26 +1464,18 @@
             </div>
         </div>
 
-        <!-- 第二排：统计和控制按钮 -->
-        <div class="second-row">
-            <div class="stats-container">
-                <div class="stats-item">
-                    <span class="stats-label">总题数</span>
-                    <span id="totalCount">0</span>
-                </div>
-                <div class="stats-item">
-                    <span class="stats-label">正确数</span>
-                    <span id="correctCount">0</span>
-                </div>
-                <div class="stats-item">
-                    <span class="stats-label">准确率</span>
-                    <span id="accuracyRate">0%</span>
-                </div>
-                <div class="stats-item">
-                    <span class="stats-label">平均反应</span>
-                    <span id="avgReactionTime">0.0s</span>
+        <!-- 第二排：简谱（仅竖版显示） -->
+        <div class="jianpu-row portrait-only">
+            <div class="jianpu-section">
+                <div class="section-title">简谱</div>
+                <div class="section-content">
+                    <div id="jianpu-portrait"></div>
                 </div>
             </div>
+        </div>
+
+        <!-- 第三排：控制按钮（横版第二排，竖版第三排） -->
+        <div class="second-row">
             <div class="buttons-section">
                 <button id="confirmBtn" class="control-btn confirm-btn">确认</button>
                 <button id="nextBtn" class="control-btn next-btn">下一道</button>
@@ -1395,7 +1483,7 @@
             </div>
         </div>
 
-        <!-- 第三排：钢琴键盘 -->
+        <!-- 第四排：钢琴键盘（横版第三排，竖版第四排） -->
         <div class="third-row">
             <div class="piano-container">
                 <div class="piano" id="piano"></div>
@@ -1449,8 +1537,8 @@
                 <span class="btn-icon">🌱</span>
                 返回主页
             </button>
+            </div>
         </div>
-    </div>
 
     <!-- PK模式玩家切换页面 -->
     <div id="playerSwitchPage" class="player-switch-page">
@@ -1939,6 +2027,7 @@
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
+            document.body.className = 'home-page'; // 设置首页样式
             initializeHomePage();
             initDatabase(); // 初始化数据库连接
         });
@@ -2024,6 +2113,7 @@
             createLearningSession();
             
             // 切换到学习页面
+            document.body.className = 'learning-page'; // 设置学习页面样式
             document.getElementById('home').style.display = 'none';
             document.getElementById('learning-page').style.display = 'flex';
             
@@ -2302,6 +2392,7 @@
         function startNewNote() {
             document.getElementById('staff').innerHTML = '';
             document.getElementById('jianpu').innerHTML = '';
+            document.getElementById('jianpu-portrait').innerHTML = '';
             
             selectedKey = null;
             hasShownJianpu = false;
@@ -2410,7 +2501,9 @@
                 }
             }
             
-            document.getElementById('jianpu').innerHTML = generateJianpu(currentNote.jianpu, currentNote.octave);
+            const jianpuContent = generateJianpu(currentNote.jianpu, currentNote.octave);
+            document.getElementById('jianpu').innerHTML = jianpuContent;
+            document.getElementById('jianpu-portrait').innerHTML = jianpuContent;
             hasShownJianpu = true;
             
             const isCorrect = checkAnswer();
@@ -2500,7 +2593,9 @@
                 }
                 
                 // 显示简谱
-                document.getElementById('jianpu').innerHTML = generateJianpu(currentNote.jianpu, currentNote.octave);
+                const jianpuContent = generateJianpu(currentNote.jianpu, currentNote.octave);
+                document.getElementById('jianpu').innerHTML = jianpuContent;
+                document.getElementById('jianpu-portrait').innerHTML = jianpuContent;
                 hasShownJianpu = true;
                 
                 // 检查答案（用户没选择，算错误）
@@ -2561,7 +2656,7 @@
                 }, 1000);
             } else {
                 // 已经显示过简谱，直接开始下一题
-                startNewNote();
+            startNewNote();
             }
         }
 
@@ -2818,6 +2913,7 @@
         // 返回主页
         function returnToHome() {
             // 隐藏所有页面和弹窗
+            document.body.className = 'home-page'; // 恢复首页样式
             document.getElementById('learning-page').style.display = 'none';
             document.getElementById('statsModal').classList.remove('show');
             document.getElementById('pkResultPage').classList.remove('show');
@@ -2886,18 +2982,10 @@
             }
         }
 
-        // 更新统计显示
+        // 更新统计显示（统计面板已移除，此函数保留用于数据记录）
         function updateStats() {
-            document.getElementById('totalCount').textContent = totalQuestions;
-            document.getElementById('correctCount').textContent = correctAnswers;
-            
-            const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-            document.getElementById('accuracyRate').textContent = accuracy + '%';
-            
-            const avgReaction = reactionTimes.length > 0 ? 
-                (reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length / 1000).toFixed(1) : 
-                '0.0';
-            document.getElementById('avgReactionTime').textContent = avgReaction + 's';
+            // 统计面板已移除，但保留此函数用于内部数据计算
+            // 实际的统计数据会在结束时的弹窗中显示
         }
 
         // 点击蒙层关闭弹窗
