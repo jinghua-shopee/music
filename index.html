@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>五线谱简谱学习器</title>
     <script src="./abcjs-basic-min.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -1526,6 +1527,309 @@
     </div>
 
     <script>
+        // 数据库配置
+        const DB_CONFIG = {
+            url: 'https://musicdb-jinghua-shopee.aws-ap-northeast-1.turso.io',
+            authToken: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NDgyNTE3ODAsImlkIjoiMGVmN2Q2ODAtZWViYS00NjY5LWIwMmYtYjEwNTcxZDAzMDJjIiwicmlkIjoiNzZmZTM5NDQtNjM0NS00OGYxLThlYmQtZWVkNjYzMmFkMDg1In0.4A2CQtXDz-LowxObR-21_yaxquTMRst4fNajPVI9KolXRYaZ-1qm_IuefXVNAhpe_mC9RfdhhusVU5Pis5ldDg'
+        };
+
+        // 数据库客户端
+        let currentUserId = null;
+        let currentSessionId = null;
+
+        // 执行SQL查询
+        async function executeSQL(sql, args = []) {
+            try {
+                const response = await fetch(DB_CONFIG.url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DB_CONFIG.authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            q: sql,
+                            params: args
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.results[0];
+            } catch (error) {
+                console.error('SQL执行失败:', error);
+                return null;
+            }
+        }
+
+        // 初始化数据库连接
+        async function initDatabase() {
+            try {
+                console.log('初始化数据库连接...');
+                
+                // 获取或创建用户
+                await getOrCreateUser();
+            } catch (error) {
+                console.error('数据库初始化失败:', error);
+            }
+        }
+
+        // 生成用户唯一标识
+        function generateUserIdentifier() {
+            // 尝试从localStorage获取
+            let userId = localStorage.getItem('music_user_id');
+            if (!userId) {
+                // 生成基于浏览器特征的唯一标识
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillText('Music Learning App', 2, 2);
+                
+                const fingerprint = [
+                    navigator.userAgent,
+                    navigator.language,
+                    screen.width + 'x' + screen.height,
+                    new Date().getTimezoneOffset(),
+                    canvas.toDataURL()
+                ].join('|');
+                
+                // 生成简单的hash
+                let hash = 0;
+                for (let i = 0; i < fingerprint.length; i++) {
+                    const char = fingerprint.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // 转换为32位整数
+                }
+                
+                userId = 'user_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+                localStorage.setItem('music_user_id', userId);
+            }
+            return userId;
+        }
+
+        // 获取或创建用户
+        async function getOrCreateUser() {
+            try {
+                const userIdentifier = generateUserIdentifier();
+                
+                // 查询用户是否存在
+                const result = await executeSQL('SELECT id FROM users WHERE user_identifier = ?', [userIdentifier]);
+                
+                if (result && result.rows.length > 0) {
+                    currentUserId = result.rows[0][0]; // Turso返回的是数组格式
+                    // 更新最后活跃时间
+                    await executeSQL('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?', [currentUserId]);
+                } else {
+                    // 创建新用户
+                    const insertResult = await executeSQL('INSERT INTO users (user_identifier) VALUES (?) RETURNING id', [userIdentifier]);
+                    if (insertResult && insertResult.rows.length > 0) {
+                        currentUserId = insertResult.rows[0][0];
+                    }
+                }
+                
+                console.log('用户ID:', currentUserId);
+            } catch (error) {
+                console.error('获取用户失败:', error);
+            }
+        }
+
+        // 创建学习会话
+        async function createLearningSession() {
+            try {
+                if (!currentUserId) return;
+                
+                const result = await executeSQL(
+                    `INSERT INTO learning_sessions 
+                     (user_id, mode, question_count, start_time) 
+                     VALUES (?, ?, ?, CURRENT_TIMESTAMP) RETURNING id`,
+                    [currentUserId, gameMode, questionCount]
+                );
+                
+                if (result && result.rows.length > 0) {
+                    currentSessionId = result.rows[0][0];
+                    console.log('会话ID:', currentSessionId);
+                }
+            } catch (error) {
+                console.error('创建会话失败:', error);
+            }
+        }
+
+        // 记录题目答题情况
+        async function recordQuestion(questionData) {
+            try {
+                if (!currentSessionId) return;
+                
+                await executeSQL(
+                    `INSERT INTO question_records 
+                     (session_id, question_index, note_abc, note_jianpu, note_octave, 
+                      piano_key, user_answer, is_correct, reaction_time, pause_time) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                        currentSessionId,
+                        questionData.questionIndex,
+                        questionData.noteAbc,
+                        questionData.noteJianpu,
+                        questionData.noteOctave,
+                        questionData.pianoKey,
+                        questionData.userAnswer,
+                        questionData.isCorrect,
+                        questionData.reactionTime,
+                        questionData.pauseTime
+                    ]
+                );
+                
+                // 更新音符统计
+                await updateNoteStatistics(questionData);
+            } catch (error) {
+                console.error('记录题目失败:', error);
+            }
+        }
+
+        // 更新音符统计
+        async function updateNoteStatistics(questionData) {
+            try {
+                if (!currentUserId) return;
+                
+                // 查询现有统计
+                const result = await executeSQL(
+                    'SELECT id, total_attempts, correct_attempts, avg_reaction_time FROM note_statistics WHERE user_id = ? AND piano_key = ?',
+                    [currentUserId, questionData.pianoKey]
+                );
+                
+                if (result && result.rows.length > 0) {
+                    // 更新现有记录
+                    const stats = result.rows[0];
+                    const statsId = stats[0];
+                    const totalAttempts = stats[1];
+                    const correctAttempts = stats[2];
+                    const avgReactionTime = stats[3];
+                    
+                    const newTotal = totalAttempts + 1;
+                    const newCorrect = correctAttempts + (questionData.isCorrect ? 1 : 0);
+                    const newSuccessRate = (newCorrect / newTotal) * 100;
+                    const newAvgReaction = questionData.reactionTime ? 
+                        ((avgReactionTime * totalAttempts) + questionData.reactionTime) / newTotal :
+                        avgReactionTime;
+                    
+                    await executeSQL(
+                        `UPDATE note_statistics 
+                         SET total_attempts = ?, correct_attempts = ?, 
+                             success_rate = ?, avg_reaction_time = ?, last_updated = CURRENT_TIMESTAMP 
+                         WHERE id = ?`,
+                        [newTotal, newCorrect, newSuccessRate, newAvgReaction, statsId]
+                    );
+                } else {
+                    // 创建新记录
+                    const successRate = questionData.isCorrect ? 100 : 0;
+                    await executeSQL(
+                        `INSERT INTO note_statistics 
+                         (user_id, note_abc, note_jianpu, note_octave, piano_key, 
+                          total_attempts, correct_attempts, success_rate, avg_reaction_time) 
+                         VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`,
+                        [
+                            currentUserId,
+                            questionData.noteAbc,
+                            questionData.noteJianpu,
+                            questionData.noteOctave,
+                            questionData.pianoKey,
+                            questionData.isCorrect ? 1 : 0,
+                            successRate,
+                            questionData.reactionTime || 0
+                        ]
+                    );
+                }
+            } catch (error) {
+                console.error('更新音符统计失败:', error);
+            }
+        }
+
+        // 完成学习会话
+        async function completeLearningSession(sessionData) {
+            try {
+                if (!currentSessionId) return;
+                
+                await executeSQL(
+                    `UPDATE learning_sessions 
+                     SET end_time = CURRENT_TIMESTAMP, duration_seconds = ?, 
+                         total_questions = ?, correct_answers = ?, 
+                         accuracy_rate = ?, avg_reaction_time = ?, is_completed = ? 
+                     WHERE id = ?`,
+                    [
+                        sessionData.durationSeconds,
+                        sessionData.totalQuestions,
+                        sessionData.correctAnswers,
+                        sessionData.accuracyRate,
+                        sessionData.avgReactionTime,
+                        sessionData.isCompleted,
+                        currentSessionId
+                    ]
+                );
+                
+                // 如果是PK模式，记录对战数据
+                if (gameMode === 'pk') {
+                    await recordPKBattle(sessionData);
+                }
+                
+                // 更新用户总统计
+                await executeSQL(
+                    `UPDATE users 
+                     SET total_sessions = total_sessions + 1, 
+                         total_questions = total_questions + ? 
+                     WHERE id = ?`,
+                    [sessionData.totalQuestions, currentUserId]
+                );
+                
+                console.log('会话完成记录成功');
+            } catch (error) {
+                console.error('完成会话失败:', error);
+            }
+        }
+
+        // 记录PK对战数据
+        async function recordPKBattle(sessionData) {
+            try {
+                if (!currentSessionId) return;
+                
+                // 确定获胜者
+                let winner = 0; // 平局
+                if (sessionData.player1Stats && sessionData.player2Stats) {
+                    const p1Score = sessionData.player1Stats.correct / Math.max(sessionData.player1Stats.total, 1);
+                    const p2Score = sessionData.player2Stats.correct / Math.max(sessionData.player2Stats.total, 1);
+                    
+                    if (p1Score > p2Score) winner = 1;
+                    else if (p2Score > p1Score) winner = 2;
+                }
+                
+                await executeSQL(
+                    `INSERT INTO pk_battles 
+                     (session_id, player1_user_id, player1_questions, player1_correct, 
+                      player1_accuracy, player1_avg_reaction, player2_questions, player2_correct, 
+                      player2_accuracy, player2_avg_reaction, winner) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                        currentSessionId,
+                        currentUserId,
+                        sessionData.player1Stats?.total || 0,
+                        sessionData.player1Stats?.correct || 0,
+                        sessionData.player1Stats?.accuracy || 0,
+                        sessionData.player1Stats?.avgReaction || 0,
+                        sessionData.player2Stats?.total || 0,
+                        sessionData.player2Stats?.correct || 0,
+                        sessionData.player2Stats?.accuracy || 0,
+                        sessionData.player2Stats?.avgReaction || 0,
+                        winner
+                    ]
+                );
+            } catch (error) {
+                console.error('记录PK对战失败:', error);
+            }
+        }
+
         // 全局变量
         let isPaused = false;
         let currentNote = null;
@@ -1548,6 +1852,7 @@
         let questionStartTime = null; // 题目开始时间
         let pauseStartTime = null; // 暂停开始时间
         let totalPauseTime = 0; // 当前题目的总暂停时间
+        let sessionStartTime = null; // 会话开始时间
 
         // PK模式变量
         let currentPlayer = 1; // 1 或 2
@@ -1592,6 +1897,7 @@
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
             initializeHomePage();
+            initDatabase(); // 初始化数据库连接
         });
 
         // 初始化主页
@@ -1661,8 +1967,14 @@
                 return;
             }
 
+            // 记录会话开始时间
+            sessionStartTime = Date.now();
+
             // 初始化游戏状态
             initializeGame();
+            
+            // 创建数据库会话
+            createLearningSession();
             
             // 切换到学习页面
             document.getElementById('home').style.display = 'none';
@@ -2020,10 +2332,11 @@
         function confirmAnswer() {
             if (isPaused || !currentNote || hasShownJianpu) return;
             
+            let reactionTime = 0;
             if (questionStartTime) {
-                const reactionTime = Date.now() - questionStartTime - totalPauseTime;
+                reactionTime = Date.now() - questionStartTime - totalPauseTime;
                 reactionTimes.push(reactionTime);
-                
+            
                 // PK模式记录到对应玩家
                 if (gameMode === 'pk') {
                     if (currentPlayer === 1) {
@@ -2054,6 +2367,19 @@
                     if (isCorrect) player2Stats.correct++;
                 }
             }
+            
+            // 记录题目到数据库
+            recordQuestion({
+                questionIndex: currentQuestionIndex,
+                noteAbc: currentNote.abc,
+                noteJianpu: currentNote.jianpu,
+                noteOctave: currentNote.octave,
+                pianoKey: currentNote.pianoKey,
+                userAnswer: selectedKey,
+                isCorrect: isCorrect,
+                reactionTime: reactionTime,
+                pauseTime: totalPauseTime
+            });
             
             updateStats();
             
@@ -2091,8 +2417,9 @@
             // 如果还没有显示简谱，说明用户直接点击了下一道，需要统计
             if (!hasShownJianpu) {
                 // 计算反应时间（如果有的话）
+                let reactionTime = 0;
                 if (questionStartTime) {
-                    const reactionTime = Date.now() - questionStartTime - totalPauseTime;
+                    reactionTime = Date.now() - questionStartTime - totalPauseTime;
                     reactionTimes.push(reactionTime);
                     
                     // PK模式记录到对应玩家
@@ -2110,7 +2437,7 @@
                 hasShownJianpu = true;
                 
                 // 检查答案（用户没选择，算错误）
-                checkAnswer();
+                const isCorrect = checkAnswer();
                 
                 // 更新统计
                 totalQuestions++;
@@ -2126,6 +2453,19 @@
                         // 不增加correct，因为用户没有选择
                     }
                 }
+                
+                // 记录题目到数据库
+                recordQuestion({
+                    questionIndex: currentQuestionIndex,
+                    noteAbc: currentNote.abc,
+                    noteJianpu: currentNote.jianpu,
+                    noteOctave: currentNote.octave,
+                    pianoKey: currentNote.pianoKey,
+                    userAnswer: selectedKey, // 可能为null
+                    isCorrect: isCorrect,
+                    reactionTime: reactionTime,
+                    pauseTime: totalPauseTime
+                });
                 
                 updateStats();
                 currentQuestionIndex++;
@@ -2219,6 +2559,20 @@
                     (reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length / 1000).toFixed(1) : 
                     '0.0';
                 document.getElementById('finalAvgReactionTime').textContent = avgReaction + 's';
+                
+                // 记录会话完成到数据库
+                const durationSeconds = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+                const avgReactionMs = reactionTimes.length > 0 ? 
+                    reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length : 0;
+                
+                completeLearningSession({
+                    durationSeconds: durationSeconds,
+                    totalQuestions: totalQuestions,
+                    correctAnswers: correctAnswers,
+                    accuracyRate: accuracy,
+                    avgReactionTime: avgReactionMs,
+                    isCompleted: true
+                });
                 
                 document.getElementById('statsModal').classList.add('show');
             }
@@ -2344,6 +2698,42 @@
             }
             
             document.getElementById('pkResultPage').classList.add('show');
+            
+            // 记录PK会话完成到数据库
+            const durationSeconds = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+            const totalQuestionsAll = player1Stats.total + player2Stats.total;
+            const totalCorrectAll = player1Stats.correct + player2Stats.correct;
+            const accuracyAll = totalQuestionsAll > 0 ? Math.round((totalCorrectAll / totalQuestionsAll) * 100) : 0;
+            
+            const allReactionTimes = [...player1Stats.reactionTimes, ...player2Stats.reactionTimes];
+            const avgReactionMs = allReactionTimes.length > 0 ? 
+                allReactionTimes.reduce((sum, time) => sum + time, 0) / allReactionTimes.length : 0;
+            
+            const p1AvgReactionMs = player1Stats.reactionTimes.length > 0 ? 
+                player1Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player1Stats.reactionTimes.length : 0;
+            const p2AvgReactionMs = player2Stats.reactionTimes.length > 0 ? 
+                player2Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player2Stats.reactionTimes.length : 0;
+            
+            completeLearningSession({
+                durationSeconds: durationSeconds,
+                totalQuestions: totalQuestionsAll,
+                correctAnswers: totalCorrectAll,
+                accuracyRate: accuracyAll,
+                avgReactionTime: avgReactionMs,
+                isCompleted: true,
+                player1Stats: {
+                    total: player1Stats.total,
+                    correct: player1Stats.correct,
+                    accuracy: p1Accuracy,
+                    avgReaction: p1AvgReactionMs
+                },
+                player2Stats: {
+                    total: player2Stats.total,
+                    correct: player2Stats.correct,
+                    accuracy: p2Accuracy,
+                    avgReaction: p2AvgReactionMs
+                }
+            });
         }
 
         // 返回主页
@@ -2364,6 +2754,12 @@
             currentPlayer = 1;
             player1Stats = { total: 0, correct: 0, reactionTimes: [] };
             player2Stats = { total: 0, correct: 0, reactionTimes: [] };
+            
+            // 重置会话相关变量
+            currentSessionId = null;
+            sessionStartTime = null;
+            pauseStartTime = null;
+            totalPauseTime = 0;
             
             // 清除选择状态
             document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
