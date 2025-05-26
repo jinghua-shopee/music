@@ -1526,57 +1526,40 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // 导入Turso客户端
+        import { createClient } from "https://esm.sh/@libsql/client/web";
+
         // 数据库配置
         const DB_CONFIG = {
-            url: 'https://musicdb-jinghua-shopee.aws-ap-northeast-1.turso.io',
+            url: 'libsql://musicdb-jinghua-shopee.aws-ap-northeast-1.turso.io',
             authToken: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NDgyNTE3ODAsImlkIjoiMGVmN2Q2ODAtZWViYS00NjY5LWIwMmYtYjEwNTcxZDAzMDJjIiwicmlkIjoiNzZmZTM5NDQtNjM0NS00OGYxLThlYmQtZWVkNjYzMmFkMDg1In0.4A2CQtXDz-LowxObR-21_yaxquTMRst4fNajPVI9KolXRYaZ-1qm_IuefXVNAhpe_mC9RfdhhusVU5Pis5ldDg'
         };
 
         // 数据库客户端
+        let dbClient = null;
         let currentUserId = null;
         let currentSessionId = null;
-
-        // 执行SQL查询
-        async function executeSQL(sql, args = []) {
-            try {
-                const response = await fetch(DB_CONFIG.url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${DB_CONFIG.authToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        statements: [{
-                            q: sql,
-                            params: args
-                        }]
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data.results[0];
-            } catch (error) {
-                console.error('SQL执行失败:', error);
-                return null;
-            }
-        }
+        
+        // 将变量和函数设置为全局可访问
+        window.dbClient = dbClient;
+        window.currentUserId = currentUserId;
+        window.currentSessionId = currentSessionId;
 
         // 初始化数据库连接
         async function initDatabase() {
             try {
-                console.log('初始化数据库连接...');
+                dbClient = createClient(DB_CONFIG);
+                window.dbClient = dbClient;
+                console.log('数据库连接成功');
                 
                 // 获取或创建用户
                 await getOrCreateUser();
             } catch (error) {
-                console.error('数据库初始化失败:', error);
+                console.error('数据库连接失败:', error);
             }
         }
+        window.initDatabase = initDatabase;
 
         // 生成用户唯一标识
         function generateUserIdentifier() {
@@ -1618,18 +1601,27 @@
                 const userIdentifier = generateUserIdentifier();
                 
                 // 查询用户是否存在
-                const result = await executeSQL('SELECT id FROM users WHERE user_identifier = ?', [userIdentifier]);
+                const result = await dbClient.execute({
+                    sql: 'SELECT id FROM users WHERE user_identifier = ?',
+                    args: [userIdentifier]
+                });
                 
-                if (result && result.rows.length > 0) {
-                    currentUserId = result.rows[0][0]; // Turso返回的是数组格式
+                if (result.rows.length > 0) {
+                    currentUserId = result.rows[0].id;
+                    window.currentUserId = currentUserId;
                     // 更新最后活跃时间
-                    await executeSQL('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?', [currentUserId]);
+                    await dbClient.execute({
+                        sql: 'UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?',
+                        args: [currentUserId]
+                    });
                 } else {
                     // 创建新用户
-                    const insertResult = await executeSQL('INSERT INTO users (user_identifier) VALUES (?) RETURNING id', [userIdentifier]);
-                    if (insertResult && insertResult.rows.length > 0) {
-                        currentUserId = insertResult.rows[0][0];
-                    }
+                    const insertResult = await dbClient.execute({
+                        sql: 'INSERT INTO users (user_identifier) VALUES (?) RETURNING id',
+                        args: [userIdentifier]
+                    });
+                    currentUserId = insertResult.rows[0].id;
+                    window.currentUserId = currentUserId;
                 }
                 
                 console.log('用户ID:', currentUserId);
@@ -1641,36 +1633,36 @@
         // 创建学习会话
         async function createLearningSession() {
             try {
-                if (!currentUserId) return;
+                if (!window.dbClient || !window.currentUserId) return;
                 
-                const result = await executeSQL(
-                    `INSERT INTO learning_sessions 
-                     (user_id, mode, question_count, start_time) 
-                     VALUES (?, ?, ?, CURRENT_TIMESTAMP) RETURNING id`,
-                    [currentUserId, gameMode, questionCount]
-                );
+                const result = await window.dbClient.execute({
+                    sql: `INSERT INTO learning_sessions 
+                          (user_id, mode, question_count, start_time) 
+                          VALUES (?, ?, ?, CURRENT_TIMESTAMP) RETURNING id`,
+                    args: [window.currentUserId, window.gameMode, window.questionCount]
+                });
                 
-                if (result && result.rows.length > 0) {
-                    currentSessionId = result.rows[0][0];
-                    console.log('会话ID:', currentSessionId);
-                }
+                currentSessionId = result.rows[0].id;
+                window.currentSessionId = currentSessionId;
+                console.log('会话ID:', currentSessionId);
             } catch (error) {
                 console.error('创建会话失败:', error);
             }
         }
+        window.createLearningSession = createLearningSession;
 
         // 记录题目答题情况
         async function recordQuestion(questionData) {
             try {
-                if (!currentSessionId) return;
+                if (!window.dbClient || !window.currentSessionId) return;
                 
-                await executeSQL(
-                    `INSERT INTO question_records 
-                     (session_id, question_index, note_abc, note_jianpu, note_octave, 
-                      piano_key, user_answer, is_correct, reaction_time, pause_time) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [
-                        currentSessionId,
+                await window.dbClient.execute({
+                    sql: `INSERT INTO question_records 
+                          (session_id, question_index, note_abc, note_jianpu, note_octave, 
+                           piano_key, user_answer, is_correct, reaction_time, pause_time) 
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    args: [
+                        window.currentSessionId,
                         questionData.questionIndex,
                         questionData.noteAbc,
                         questionData.noteJianpu,
@@ -1681,7 +1673,7 @@
                         questionData.reactionTime,
                         questionData.pauseTime
                     ]
-                );
+                });
                 
                 // 更新音符统计
                 await updateNoteStatistics(questionData);
@@ -1689,50 +1681,46 @@
                 console.error('记录题目失败:', error);
             }
         }
+        window.recordQuestion = recordQuestion;
 
         // 更新音符统计
         async function updateNoteStatistics(questionData) {
             try {
-                if (!currentUserId) return;
+                if (!window.dbClient || !window.currentUserId) return;
                 
                 // 查询现有统计
-                const result = await executeSQL(
-                    'SELECT id, total_attempts, correct_attempts, avg_reaction_time FROM note_statistics WHERE user_id = ? AND piano_key = ?',
-                    [currentUserId, questionData.pianoKey]
-                );
+                const result = await window.dbClient.execute({
+                    sql: 'SELECT * FROM note_statistics WHERE user_id = ? AND piano_key = ?',
+                    args: [window.currentUserId, questionData.pianoKey]
+                });
                 
-                if (result && result.rows.length > 0) {
+                if (result.rows.length > 0) {
                     // 更新现有记录
                     const stats = result.rows[0];
-                    const statsId = stats[0];
-                    const totalAttempts = stats[1];
-                    const correctAttempts = stats[2];
-                    const avgReactionTime = stats[3];
-                    
-                    const newTotal = totalAttempts + 1;
-                    const newCorrect = correctAttempts + (questionData.isCorrect ? 1 : 0);
+                    const newTotal = stats.total_attempts + 1;
+                    const newCorrect = stats.correct_attempts + (questionData.isCorrect ? 1 : 0);
                     const newSuccessRate = (newCorrect / newTotal) * 100;
                     const newAvgReaction = questionData.reactionTime ? 
-                        ((avgReactionTime * totalAttempts) + questionData.reactionTime) / newTotal :
-                        avgReactionTime;
+                        ((stats.avg_reaction_time * stats.total_attempts) + questionData.reactionTime) / newTotal :
+                        stats.avg_reaction_time;
                     
-                    await executeSQL(
-                        `UPDATE note_statistics 
-                         SET total_attempts = ?, correct_attempts = ?, 
-                             success_rate = ?, avg_reaction_time = ?, last_updated = CURRENT_TIMESTAMP 
-                         WHERE id = ?`,
-                        [newTotal, newCorrect, newSuccessRate, newAvgReaction, statsId]
-                    );
+                    await window.dbClient.execute({
+                        sql: `UPDATE note_statistics 
+                              SET total_attempts = ?, correct_attempts = ?, 
+                                  success_rate = ?, avg_reaction_time = ?, last_updated = CURRENT_TIMESTAMP 
+                              WHERE id = ?`,
+                        args: [newTotal, newCorrect, newSuccessRate, newAvgReaction, stats.id]
+                    });
                 } else {
                     // 创建新记录
                     const successRate = questionData.isCorrect ? 100 : 0;
-                    await executeSQL(
-                        `INSERT INTO note_statistics 
-                         (user_id, note_abc, note_jianpu, note_octave, piano_key, 
-                          total_attempts, correct_attempts, success_rate, avg_reaction_time) 
-                         VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`,
-                        [
-                            currentUserId,
+                    await window.dbClient.execute({
+                        sql: `INSERT INTO note_statistics 
+                              (user_id, note_abc, note_jianpu, note_octave, piano_key, 
+                               total_attempts, correct_attempts, success_rate, avg_reaction_time) 
+                              VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`,
+                        args: [
+                            window.currentUserId,
                             questionData.noteAbc,
                             questionData.noteJianpu,
                             questionData.noteOctave,
@@ -1741,7 +1729,7 @@
                             successRate,
                             questionData.reactionTime || 0
                         ]
-                    );
+                    });
                 }
             } catch (error) {
                 console.error('更新音符统计失败:', error);
@@ -1751,49 +1739,50 @@
         // 完成学习会话
         async function completeLearningSession(sessionData) {
             try {
-                if (!currentSessionId) return;
+                if (!window.dbClient || !window.currentSessionId) return;
                 
-                await executeSQL(
-                    `UPDATE learning_sessions 
-                     SET end_time = CURRENT_TIMESTAMP, duration_seconds = ?, 
-                         total_questions = ?, correct_answers = ?, 
-                         accuracy_rate = ?, avg_reaction_time = ?, is_completed = ? 
-                     WHERE id = ?`,
-                    [
+                await window.dbClient.execute({
+                    sql: `UPDATE learning_sessions 
+                          SET end_time = CURRENT_TIMESTAMP, duration_seconds = ?, 
+                              total_questions = ?, correct_answers = ?, 
+                              accuracy_rate = ?, avg_reaction_time = ?, is_completed = ? 
+                          WHERE id = ?`,
+                    args: [
                         sessionData.durationSeconds,
                         sessionData.totalQuestions,
                         sessionData.correctAnswers,
                         sessionData.accuracyRate,
                         sessionData.avgReactionTime,
                         sessionData.isCompleted,
-                        currentSessionId
+                        window.currentSessionId
                     ]
-                );
+                });
                 
                 // 如果是PK模式，记录对战数据
-                if (gameMode === 'pk') {
+                if (window.gameMode === 'pk') {
                     await recordPKBattle(sessionData);
                 }
                 
                 // 更新用户总统计
-                await executeSQL(
-                    `UPDATE users 
-                     SET total_sessions = total_sessions + 1, 
-                         total_questions = total_questions + ? 
-                     WHERE id = ?`,
-                    [sessionData.totalQuestions, currentUserId]
-                );
+                await window.dbClient.execute({
+                    sql: `UPDATE users 
+                          SET total_sessions = total_sessions + 1, 
+                              total_questions = total_questions + ? 
+                          WHERE id = ?`,
+                    args: [sessionData.totalQuestions, window.currentUserId]
+                });
                 
                 console.log('会话完成记录成功');
             } catch (error) {
                 console.error('完成会话失败:', error);
             }
         }
+        window.completeLearningSession = completeLearningSession;
 
         // 记录PK对战数据
         async function recordPKBattle(sessionData) {
             try {
-                if (!currentSessionId) return;
+                if (!window.dbClient || !window.currentSessionId) return;
                 
                 // 确定获胜者
                 let winner = 0; // 平局
@@ -1805,15 +1794,15 @@
                     else if (p2Score > p1Score) winner = 2;
                 }
                 
-                await executeSQL(
-                    `INSERT INTO pk_battles 
-                     (session_id, player1_user_id, player1_questions, player1_correct, 
-                      player1_accuracy, player1_avg_reaction, player2_questions, player2_correct, 
-                      player2_accuracy, player2_avg_reaction, winner) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [
-                        currentSessionId,
-                        currentUserId,
+                await window.dbClient.execute({
+                    sql: `INSERT INTO pk_battles 
+                          (session_id, player1_user_id, player1_questions, player1_correct, 
+                           player1_accuracy, player1_avg_reaction, player2_questions, player2_correct, 
+                           player2_accuracy, player2_avg_reaction, winner) 
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    args: [
+                        window.currentSessionId,
+                        window.currentUserId,
                         sessionData.player1Stats?.total || 0,
                         sessionData.player1Stats?.correct || 0,
                         sessionData.player1Stats?.accuracy || 0,
@@ -1824,7 +1813,7 @@
                         sessionData.player2Stats?.avgReaction || 0,
                         winner
                     ]
-                );
+                });
             } catch (error) {
                 console.error('记录PK对战失败:', error);
             }
@@ -1860,6 +1849,23 @@
         let player2Stats = { total: 0, correct: 0, reactionTimes: [] };
         let switchCountdownTimer = null;
 
+        // 将游戏变量设置为全局可访问
+        window.gameMode = gameMode;
+        window.questionCount = questionCount;
+        window.currentQuestionIndex = currentQuestionIndex;
+        window.maxQuestions = maxQuestions;
+        window.totalQuestions = totalQuestions;
+        window.correctAnswers = correctAnswers;
+        window.reactionTimes = reactionTimes;
+        window.questionStartTime = questionStartTime;
+        window.pauseStartTime = pauseStartTime;
+        window.totalPauseTime = totalPauseTime;
+        window.sessionStartTime = sessionStartTime;
+        window.currentPlayer = currentPlayer;
+        window.player1Stats = player1Stats;
+        window.player2Stats = player2Stats;
+        window.switchCountdownTimer = switchCountdownTimer;
+
         const notes = [
             // 高音区 F4到B6
             { abc: "F",   jianpu: "4", octave: 4, pianoKey: "F4" },
@@ -1894,6 +1900,43 @@
             { abc: "G,",    jianpu: "5", octave: 3, pianoKey: "G3" }
         ];
 
+        // 将所有主要函数设置为全局可访问
+        window.generateUserIdentifier = generateUserIdentifier;
+        window.getOrCreateUser = getOrCreateUser;
+        window.updateNoteStatistics = updateNoteStatistics;
+        window.recordPKBattle = recordPKBattle;
+        window.initializeHomePage = initializeHomePage;
+        window.updateQuestionOptions = updateQuestionOptions;
+        window.showToast = showToast;
+        window.startLearning = startLearning;
+        window.initializeGame = initializeGame;
+        window.generateFullPianoKeys = generateFullPianoKeys;
+        window.getBlackKeyOffset = getBlackKeyOffset;
+        window.initAudioContext = initAudioContext;
+        window.playPianoNote = playPianoNote;
+        window.renderPianoKeyboard = renderPianoKeyboard;
+        window.handleKeyClick = handleKeyClick;
+        window.clearKeyHighlights = clearKeyHighlights;
+        window.checkAnswer = checkAnswer;
+        window.generateJianpu = generateJianpu;
+        window.getRandomNote = getRandomNote;
+        window.startNewNote = startNewNote;
+        window.scrollToPianoKey = scrollToPianoKey;
+        window.scrollToCenterC = scrollToCenterC;
+        window.confirmAnswer = confirmAnswer;
+        window.nextQuestion = nextQuestion;
+        window.showEndConfirmModal = showEndConfirmModal;
+        window.closeEndConfirmModal = closeEndConfirmModal;
+        window.confirmEndPractice = confirmEndPractice;
+        window.showStatsModal = showStatsModal;
+        window.switchToPlayer2 = switchToPlayer2;
+        window.skipCountdown = skipCountdown;
+        window.startPlayer2 = startPlayer2;
+        window.showPKResult = showPKResult;
+        window.returnToHome = returnToHome;
+        window.togglePause = togglePause;
+        window.updateStats = updateStats;
+
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
             initializeHomePage();
@@ -1908,6 +1951,7 @@
                     document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
                     this.classList.add('selected');
                     gameMode = this.dataset.mode;
+                    window.gameMode = gameMode;
                     
                     // 更新题目数量选择状态
                     updateQuestionOptions();
@@ -1922,6 +1966,7 @@
                     document.querySelectorAll('.question-option').forEach(o => o.classList.remove('selected'));
                     this.classList.add('selected');
                     questionCount = this.dataset.count;
+                    window.questionCount = questionCount;
                 });
             });
         }
@@ -1930,13 +1975,14 @@
         function updateQuestionOptions() {
             const endlessOption = document.querySelector('[data-count="endless"]');
             
-            if (gameMode === 'practice') {
+            if (window.gameMode === 'practice') {
                 endlessOption.classList.remove('disabled');
             } else {
                 endlessOption.classList.add('disabled');
-                if (questionCount === 'endless') {
+                if (window.questionCount === 'endless') {
                     endlessOption.classList.remove('selected');
                     questionCount = null;
+                    window.questionCount = questionCount;
                 }
             }
         }
@@ -1957,18 +2003,19 @@
         // 开始学习
         function startLearning() {
             // 验证选择
-            if (!gameMode) {
+            if (!window.gameMode) {
                 showToast('请先选择学习模式');
                 return;
             }
             
-            if (!questionCount) {
+            if (!window.questionCount) {
                 showToast('请先选择题目数量');
                 return;
             }
 
             // 记录会话开始时间
             sessionStartTime = Date.now();
+            window.sessionStartTime = sessionStartTime;
 
             // 初始化游戏状态
             initializeGame();
@@ -2003,18 +2050,30 @@
             pauseStartTime = null;
             totalPauseTime = 0;
             
-            if (questionCount === 'endless') {
+            if (window.questionCount === 'endless') {
                 maxQuestions = Infinity;
             } else {
-                maxQuestions = parseInt(questionCount);
+                maxQuestions = parseInt(window.questionCount);
             }
             
-            if (gameMode === 'pk') {
+            if (window.gameMode === 'pk') {
                 currentPlayer = 1;
                 player1Stats = { total: 0, correct: 0, reactionTimes: [] };
                 player2Stats = { total: 0, correct: 0, reactionTimes: [] };
-                maxQuestions = parseInt(questionCount); // PK模式不支持无尽模式
+                maxQuestions = parseInt(window.questionCount); // PK模式不支持无尽模式
             }
+            
+            // 同步到window对象
+            window.currentQuestionIndex = currentQuestionIndex;
+            window.totalQuestions = totalQuestions;
+            window.correctAnswers = correctAnswers;
+            window.reactionTimes = reactionTimes;
+            window.pauseStartTime = pauseStartTime;
+            window.totalPauseTime = totalPauseTime;
+            window.maxQuestions = maxQuestions;
+            window.currentPlayer = currentPlayer;
+            window.player1Stats = player1Stats;
+            window.player2Stats = player2Stats;
         }
 
         // 生成完整88键钢琴键盘数据
@@ -2251,6 +2310,8 @@
             // 重置暂停时间
             totalPauseTime = 0;
             pauseStartTime = null;
+            window.totalPauseTime = totalPauseTime;
+            window.pauseStartTime = pauseStartTime;
             
             currentNote = getRandomNote();
             previousNote = currentNote;
@@ -2267,6 +2328,7 @@
 
             scrollToPianoKey(currentNote.pianoKey);
             questionStartTime = Date.now();
+            window.questionStartTime = questionStartTime;
         }
 
         // 滚动键盘到指定音符位置
@@ -2336,13 +2398,14 @@
             if (questionStartTime) {
                 reactionTime = Date.now() - questionStartTime - totalPauseTime;
                 reactionTimes.push(reactionTime);
+                window.reactionTimes = reactionTimes;
             
                 // PK模式记录到对应玩家
-                if (gameMode === 'pk') {
-                    if (currentPlayer === 1) {
-                        player1Stats.reactionTimes.push(reactionTime);
+                if (window.gameMode === 'pk') {
+                    if (window.currentPlayer === 1) {
+                        window.player1Stats.reactionTimes.push(reactionTime);
                     } else {
-                        player2Stats.reactionTimes.push(reactionTime);
+                        window.player2Stats.reactionTimes.push(reactionTime);
                     }
                 }
             }
@@ -2353,18 +2416,20 @@
             const isCorrect = checkAnswer();
             
             totalQuestions++;
+            window.totalQuestions = totalQuestions;
             if (isCorrect) {
                 correctAnswers++;
+                window.correctAnswers = correctAnswers;
             }
             
             // PK模式更新对应玩家统计
-            if (gameMode === 'pk') {
-                if (currentPlayer === 1) {
-                    player1Stats.total++;
-                    if (isCorrect) player1Stats.correct++;
+            if (window.gameMode === 'pk') {
+                if (window.currentPlayer === 1) {
+                    window.player1Stats.total++;
+                    if (isCorrect) window.player1Stats.correct++;
                 } else {
-                    player2Stats.total++;
-                    if (isCorrect) player2Stats.correct++;
+                    window.player2Stats.total++;
+                    if (isCorrect) window.player2Stats.correct++;
                 }
             }
             
@@ -2384,10 +2449,11 @@
             updateStats();
             
             currentQuestionIndex++;
+            window.currentQuestionIndex = currentQuestionIndex;
             
             // 检查是否完成
-            if (currentQuestionIndex >= maxQuestions) {
-                if (gameMode === 'pk' && currentPlayer === 1) {
+            if (currentQuestionIndex >= window.maxQuestions) {
+                if (window.gameMode === 'pk' && window.currentPlayer === 1) {
                     // PK模式玩家1完成，切换到玩家2
                     setTimeout(() => {
                         switchToPlayer2();
@@ -2421,6 +2487,7 @@
                 if (questionStartTime) {
                     reactionTime = Date.now() - questionStartTime - totalPauseTime;
                     reactionTimes.push(reactionTime);
+                    window.reactionTimes = reactionTimes;
                     
                     // PK模式记录到对应玩家
                     if (gameMode === 'pk') {
@@ -2441,15 +2508,16 @@
                 
                 // 更新统计
                 totalQuestions++;
+                window.totalQuestions = totalQuestions;
                 // 不增加正确数，因为用户没有选择
                 
                 // PK模式更新对应玩家统计
-                if (gameMode === 'pk') {
-                    if (currentPlayer === 1) {
-                        player1Stats.total++;
+                if (window.gameMode === 'pk') {
+                    if (window.currentPlayer === 1) {
+                        window.player1Stats.total++;
                         // 不增加correct，因为用户没有选择
                     } else {
-                        player2Stats.total++;
+                        window.player2Stats.total++;
                         // 不增加correct，因为用户没有选择
                     }
                 }
@@ -2469,10 +2537,11 @@
                 
                 updateStats();
                 currentQuestionIndex++;
+                window.currentQuestionIndex = currentQuestionIndex;
                 
                 // 检查是否完成
-                if (currentQuestionIndex >= maxQuestions) {
-                    if (gameMode === 'pk' && currentPlayer === 1) {
+                if (currentQuestionIndex >= window.maxQuestions) {
+                    if (window.gameMode === 'pk' && window.currentPlayer === 1) {
                         // PK模式玩家1完成，切换到玩家2
                         setTimeout(() => {
                             switchToPlayer2();
@@ -2500,25 +2569,25 @@
         function showEndConfirmModal() {
             if (isPaused) return;
             
-            document.getElementById('currentProgress').textContent = currentQuestionIndex;
-            document.getElementById('totalProgress').textContent = maxQuestions === Infinity ? '∞' : maxQuestions;
+            document.getElementById('currentProgress').textContent = window.currentQuestionIndex;
+            document.getElementById('totalProgress').textContent = window.maxQuestions === Infinity ? '∞' : window.maxQuestions;
             
             // PK模式下显示不同的文案
             const modalTitle = document.querySelector('#endConfirmModal .modal-title');
             const modalText = document.querySelector('#endConfirmModal .modal-text');
             const confirmBtn = document.querySelector('#endConfirmModal .confirm-btn');
             
-            if (gameMode === 'pk' && currentPlayer === 1) {
+            if (window.gameMode === 'pk' && window.currentPlayer === 1) {
                 modalTitle.textContent = '提前结束当前轮次？';
-                modalText.innerHTML = `已完成 <span id="currentProgress">${currentQuestionIndex}</span>/<span id="totalProgress">${maxQuestions === Infinity ? '∞' : maxQuestions}</span>，确认将切换到玩家2`;
+                modalText.innerHTML = `已完成 <span id="currentProgress">${window.currentQuestionIndex}</span>/<span id="totalProgress">${window.maxQuestions === Infinity ? '∞' : window.maxQuestions}</span>，确认将切换到玩家2`;
                 confirmBtn.textContent = '确认切换';
-            } else if (gameMode === 'pk' && currentPlayer === 2) {
+            } else if (window.gameMode === 'pk' && window.currentPlayer === 2) {
                 modalTitle.textContent = '提前结束对战？';
-                modalText.innerHTML = `已完成 <span id="currentProgress">${currentQuestionIndex}</span>/<span id="totalProgress">${maxQuestions === Infinity ? '∞' : maxQuestions}</span>，确认将结束对战`;
+                modalText.innerHTML = `已完成 <span id="currentProgress">${window.currentQuestionIndex}</span>/<span id="totalProgress">${window.maxQuestions === Infinity ? '∞' : window.maxQuestions}</span>，确认将结束对战`;
                 confirmBtn.textContent = '确认结束';
             } else {
                 modalTitle.textContent = '提前结束练习？';
-                modalText.innerHTML = `已完成 <span id="currentProgress">${currentQuestionIndex}</span>/<span id="totalProgress">${maxQuestions === Infinity ? '∞' : maxQuestions}</span>，确认将丢失未答题进度`;
+                modalText.innerHTML = `已完成 <span id="currentProgress">${window.currentQuestionIndex}</span>/<span id="totalProgress">${window.maxQuestions === Infinity ? '∞' : window.maxQuestions}</span>，确认将丢失未答题进度`;
                 confirmBtn.textContent = '确认结束';
             }
             
@@ -2535,7 +2604,7 @@
             closeEndConfirmModal();
             
             // PK模式下，如果是玩家1点击结束，切换到玩家2
-            if (gameMode === 'pk' && currentPlayer === 1) {
+            if (window.gameMode === 'pk' && window.currentPlayer === 1) {
                 switchToPlayer2();
             } else {
                 // 练习模式或PK模式玩家2结束，显示统计
@@ -2545,7 +2614,7 @@
 
         // 显示统计弹窗
         function showStatsModal() {
-            if (gameMode === 'pk') {
+            if (window.gameMode === 'pk') {
                 showPKResult();
             } else {
                 // 练习模式统计
@@ -2561,7 +2630,7 @@
                 document.getElementById('finalAvgReactionTime').textContent = avgReaction + 's';
                 
                 // 记录会话完成到数据库
-                const durationSeconds = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+                const durationSeconds = window.sessionStartTime ? Math.floor((Date.now() - window.sessionStartTime) / 1000) : 0;
                 const avgReactionMs = reactionTimes.length > 0 ? 
                     reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length : 0;
                 
@@ -2594,11 +2663,12 @@
                     startPlayer2();
                 }
             }, 1000);
+            window.switchCountdownTimer = switchCountdownTimer;
         }
 
         // 跳过倒计时
         function skipCountdown() {
-            clearInterval(switchCountdownTimer);
+            clearInterval(window.switchCountdownTimer);
             startPlayer2();
         }
 
@@ -2617,6 +2687,15 @@
             pauseStartTime = null;
             totalPauseTime = 0;
             
+            // 同步到window对象
+            window.currentPlayer = currentPlayer;
+            window.currentQuestionIndex = currentQuestionIndex;
+            window.totalQuestions = totalQuestions;
+            window.correctAnswers = correctAnswers;
+            window.reactionTimes = reactionTimes;
+            window.pauseStartTime = pauseStartTime;
+            window.totalPauseTime = totalPauseTime;
+            
             // 更新统计显示
             updateStats();
             
@@ -2627,24 +2706,24 @@
         // 显示PK结果
         function showPKResult() {
             // 计算统计数据
-            const p1Accuracy = player1Stats.total > 0 ? Math.round((player1Stats.correct / player1Stats.total) * 100) : 0;
-            const p2Accuracy = player2Stats.total > 0 ? Math.round((player2Stats.correct / player2Stats.total) * 100) : 0;
+            const p1Accuracy = window.player1Stats.total > 0 ? Math.round((window.player1Stats.correct / window.player1Stats.total) * 100) : 0;
+            const p2Accuracy = window.player2Stats.total > 0 ? Math.round((window.player2Stats.correct / window.player2Stats.total) * 100) : 0;
             
-            const p1AvgReaction = player1Stats.reactionTimes.length > 0 ? 
-                (player1Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player1Stats.reactionTimes.length / 1000).toFixed(1) : 
+            const p1AvgReaction = window.player1Stats.reactionTimes.length > 0 ? 
+                (window.player1Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / window.player1Stats.reactionTimes.length / 1000).toFixed(1) : 
                 '0.0';
-            const p2AvgReaction = player2Stats.reactionTimes.length > 0 ? 
-                (player2Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player2Stats.reactionTimes.length / 1000).toFixed(1) : 
+            const p2AvgReaction = window.player2Stats.reactionTimes.length > 0 ? 
+                (window.player2Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / window.player2Stats.reactionTimes.length / 1000).toFixed(1) : 
                 '0.0';
             
             // 填充数据
-            document.getElementById('p1TotalCount').textContent = player1Stats.total;
-            document.getElementById('p1CorrectCount').textContent = player1Stats.correct;
+            document.getElementById('p1TotalCount').textContent = window.player1Stats.total;
+            document.getElementById('p1CorrectCount').textContent = window.player1Stats.correct;
             document.getElementById('p1AccuracyRate').textContent = p1Accuracy + '%';
             document.getElementById('p1AvgReactionTime').textContent = p1AvgReaction + 's';
             
-            document.getElementById('p2TotalCount').textContent = player2Stats.total;
-            document.getElementById('p2CorrectCount').textContent = player2Stats.correct;
+            document.getElementById('p2TotalCount').textContent = window.player2Stats.total;
+            document.getElementById('p2CorrectCount').textContent = window.player2Stats.correct;
             document.getElementById('p2AccuracyRate').textContent = p2Accuracy + '%';
             document.getElementById('p2AvgReactionTime').textContent = p2AvgReaction + 's';
             
@@ -2654,17 +2733,17 @@
             // 每一项独立比较并添加皇冠
             
             // 1. 总题数比较
-            if (player1Stats.total > player2Stats.total) {
+            if (window.player1Stats.total > window.player2Stats.total) {
                 document.getElementById('p1TotalCrown').textContent = '👑';
-            } else if (player2Stats.total > player1Stats.total) {
+            } else if (window.player2Stats.total > window.player1Stats.total) {
                 document.getElementById('p2TotalCrown').textContent = '👑';
             }
             // 平局时都不显示皇冠
             
             // 2. 正确数比较
-            if (player1Stats.correct > player2Stats.correct) {
+            if (window.player1Stats.correct > window.player2Stats.correct) {
                 document.getElementById('p1CorrectCrown').textContent = '👑';
-            } else if (player2Stats.correct > player1Stats.correct) {
+            } else if (window.player2Stats.correct > window.player1Stats.correct) {
                 document.getElementById('p2CorrectCrown').textContent = '👑';
             }
             // 平局时都不显示皇冠
@@ -2700,19 +2779,19 @@
             document.getElementById('pkResultPage').classList.add('show');
             
             // 记录PK会话完成到数据库
-            const durationSeconds = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
-            const totalQuestionsAll = player1Stats.total + player2Stats.total;
-            const totalCorrectAll = player1Stats.correct + player2Stats.correct;
+            const durationSeconds = window.sessionStartTime ? Math.floor((Date.now() - window.sessionStartTime) / 1000) : 0;
+            const totalQuestionsAll = window.player1Stats.total + window.player2Stats.total;
+            const totalCorrectAll = window.player1Stats.correct + window.player2Stats.correct;
             const accuracyAll = totalQuestionsAll > 0 ? Math.round((totalCorrectAll / totalQuestionsAll) * 100) : 0;
             
-            const allReactionTimes = [...player1Stats.reactionTimes, ...player2Stats.reactionTimes];
+            const allReactionTimes = [...window.player1Stats.reactionTimes, ...window.player2Stats.reactionTimes];
             const avgReactionMs = allReactionTimes.length > 0 ? 
                 allReactionTimes.reduce((sum, time) => sum + time, 0) / allReactionTimes.length : 0;
             
-            const p1AvgReactionMs = player1Stats.reactionTimes.length > 0 ? 
-                player1Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player1Stats.reactionTimes.length : 0;
-            const p2AvgReactionMs = player2Stats.reactionTimes.length > 0 ? 
-                player2Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player2Stats.reactionTimes.length : 0;
+            const p1AvgReactionMs = window.player1Stats.reactionTimes.length > 0 ? 
+                window.player1Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / window.player1Stats.reactionTimes.length : 0;
+            const p2AvgReactionMs = window.player2Stats.reactionTimes.length > 0 ? 
+                window.player2Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / window.player2Stats.reactionTimes.length : 0;
             
             completeLearningSession({
                 durationSeconds: durationSeconds,
@@ -2722,14 +2801,14 @@
                 avgReactionTime: avgReactionMs,
                 isCompleted: true,
                 player1Stats: {
-                    total: player1Stats.total,
-                    correct: player1Stats.correct,
+                    total: window.player1Stats.total,
+                    correct: window.player1Stats.correct,
                     accuracy: p1Accuracy,
                     avgReaction: p1AvgReactionMs
                 },
                 player2Stats: {
-                    total: player2Stats.total,
-                    correct: player2Stats.correct,
+                    total: window.player2Stats.total,
+                    correct: window.player2Stats.correct,
                     accuracy: p2Accuracy,
                     avgReaction: p2AvgReactionMs
                 }
@@ -2761,6 +2840,21 @@
             pauseStartTime = null;
             totalPauseTime = 0;
             
+            // 同步到window对象
+            window.gameMode = gameMode;
+            window.questionCount = questionCount;
+            window.currentQuestionIndex = currentQuestionIndex;
+            window.totalQuestions = totalQuestions;
+            window.correctAnswers = correctAnswers;
+            window.reactionTimes = reactionTimes;
+            window.currentPlayer = currentPlayer;
+            window.player1Stats = player1Stats;
+            window.player2Stats = player2Stats;
+            window.currentSessionId = currentSessionId;
+            window.sessionStartTime = sessionStartTime;
+            window.pauseStartTime = pauseStartTime;
+            window.totalPauseTime = totalPauseTime;
+            
             // 清除选择状态
             document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
             document.querySelectorAll('.question-option').forEach(o => o.classList.remove('selected'));
@@ -2779,12 +2873,15 @@
                 clearTimeout(autoNextTimer);
                 // 记录暂停开始时间
                 pauseStartTime = Date.now();
+                window.pauseStartTime = pauseStartTime;
             } else {
                 pauseIcon.style.display = 'none';
                 // 计算暂停时长并累加
                 if (pauseStartTime) {
                     totalPauseTime += Date.now() - pauseStartTime;
+                    window.totalPauseTime = totalPauseTime;
                     pauseStartTime = null;
+                    window.pauseStartTime = pauseStartTime;
                 }
             }
         }
