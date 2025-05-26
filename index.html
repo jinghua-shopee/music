@@ -59,6 +59,19 @@
         }
 
         /* 横版布局 - 默认 */
+        #learning-page.landscape {
+            justify-content: space-between;
+        }
+
+        /* 竖版布局 */
+        #learning-page.portrait {
+            justify-content: space-between;
+            overflow-y: auto;
+            height: auto;
+            min-height: 100vh;
+        }
+
+        /* 横版布局 - 默认 */
         .first-row {
             display: flex;
             height: calc(60vh - 24px);
@@ -451,41 +464,47 @@
         /* 竖版布局 - 高度大于宽度时 */
         @media (orientation: portrait) {
             .landscape-only {
-                display: none;
+                display: flex !important;
             }
             
             .portrait-only {
-                display: flex;
+                display: none !important;
             }
+            
             #learning-page {
                 overflow-y: auto;
                 height: auto;
                 min-height: 100vh;
+                padding: 16px 16px 16px 16px;
             }
             
             .first-row {
                 flex-direction: column;
                 height: auto;
                 gap: 12px;
+                flex: 1;
             }
             
             .staff-section {
-                height: 35vh;
+                height: 40vh;
                 min-height: 200px;
             }
             
-            .jianpu-row .jianpu-section {
-                height: 100%;
+            .jianpu-section {
+                height: 25vh;
+                min-height: 120px;
             }
             
             .second-row {
                 height: 8vh;
                 min-height: 60px;
+                flex-shrink: 0;
             }
             
             .third-row {
-                height: 32vh;
-                min-height: 200px;
+                height: 27vh;
+                min-height: 180px;
+                flex-shrink: 0;
             }
         }
 
@@ -504,12 +523,12 @@
         /* 平板端竖版特殊适配 */
         @media (max-width: 1024px) and (min-width: 768px) and (orientation: portrait) {
             .staff-section {
-                height: 30vh;
+                height: 35vh;
                 min-height: 180px;
             }
             
-            .jianpu-row {
-                height: calc(20vh - 10px);
+            .jianpu-section {
+                height: 22vh;
                 min-height: 120px;
             }
             
@@ -519,8 +538,8 @@
             }
             
             .third-row {
-                height: 30vh;
-                min-height: 180px;
+                height: 25vh;
+                min-height: 160px;
             }
             
             .white-key {
@@ -619,13 +638,13 @@
         /* 手机端竖版 */
         @media (max-width: 767px) and (orientation: portrait) {
             .staff-section {
-                height: 25vh;
+                height: 30vh;
                 min-height: 150px;
             }
             
-            .jianpu-row {
-                height: calc(18vh - 8px);
-                min-height: 120px;
+            .jianpu-section {
+                height: 20vh;
+                min-height: 100px;
             }
             
             .second-row {
@@ -640,8 +659,8 @@
             }
             
             .third-row {
-                height: 25vh;
-                min-height: 150px;
+                height: 23vh;
+                min-height: 140px;
             }
             
             /* 首页手机端优化 */
@@ -1136,13 +1155,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: rgba(0, 0, 0, 0.6);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 9997;
             padding: 20px;
             box-sizing: border-box;
+            backdrop-filter: blur(5px);
         }
 
         .pk-result-page.show {
@@ -1150,53 +1170,63 @@
         }
 
         .pk-result-content {
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 24px;
-            padding: 40px;
-            max-width: 800px;
+            padding: 32px;
+            max-width: 600px;
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .pk-result-page.show .pk-result-content {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .pk-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            color: #1D1D1F;
-            margin-bottom: 32px;
-            letter-spacing: -0.28px;
+            color: #ffffff;
+            margin-bottom: 24px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .players-comparison {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
             display: flex;
-            gap: 32px;
-            margin-bottom: 32px;
+            gap: 20px;
         }
 
         .player-result {
             flex: 1;
             background: #F8F9FA;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 16px;
         }
 
         .player-name {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
             color: #1D1D1F;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .stat-item {
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            padding: 14px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #E9ECEF;
             position: relative;
-            padding-right: 40px; /* 为皇冠留出空间 */
-            gap: 16px;
+            padding-right: 35px; /* 为皇冠留出空间 */
+            gap: 12px;
         }
 
         .stat-item:last-child {
@@ -1204,32 +1234,32 @@
         }
 
         .stat-item .stat-label {
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
             font-weight: 500;
-            width: 90px;
+            width: 70px;
             text-align: left;
             flex-shrink: 0;
         }
 
         .stat-item .stat-value {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #1D1D1F;
-            margin-right: 8px; /* 与皇冠保持距离 */
+            margin-right: 6px; /* 与皇冠保持距离 */
             flex: 1;
             text-align: right;
         }
 
         .crown {
             position: absolute;
-            right: 8px;
+            right: 6px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 18px;
+            font-size: 16px;
             animation: rotate 2s linear infinite;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1241,7 +1271,7 @@
         }
 
         .pk-home-btn {
-            background: #007AFF;
+            background: #34C759;
             color: #ffffff;
             border: none;
             border-radius: 16px;
@@ -1250,7 +1280,12 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
         }
 
         .pk-home-btn:hover {
@@ -1334,66 +1369,81 @@
                 margin-top: 24px;
             }
 
-        /* 弹窗手机端适配 */
-        .modal-content {
-            padding: 24px;
-            margin: 20px;
-        }
-        
-        .stats-modal-content {
-            padding: 32px 24px;
-            margin: 20px;
-        }
-        
-        .pk-result-content {
-            padding: 24px;
-            margin: 20px;
-        }
-        
-        .players-comparison {
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .switch-title {
-            font-size: 24px;
-        }
-        
-        .countdown {
-            font-size: 60px;
-        }
-        
-        .player-avatar {
-            width: 60px;
-            height: 60px;
-            font-size: 30px;
-        }
-        
-        /* 手机端皇冠优化 */
-        @media (max-width: 767px) {
+        /* 竖版模式弹窗适配 */
+        @media (orientation: portrait) {
+            .pk-result-content {
+                max-width: 90%;
+                padding: 24px;
+                margin: 20px;
+            }
+            
+            .players-comparison {
+                flex-direction: column;
+                gap: 16px;
+                padding: 16px;
+            }
+            
+            .pk-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .player-name {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
             .stat-item {
-                padding-right: 35px;
-                gap: 12px;
-                padding: 12px 0;
+                padding: 8px 0;
+                padding-right: 30px;
+                gap: 10px;
             }
             
             .stat-item .stat-label {
-                width: 70px;
-                font-size: 13px;
+                width: 60px;
+                font-size: 11px;
             }
             
             .stat-item .stat-value {
-                font-size: 15px;
-                margin-right: 6px;
+                font-size: 13px;
+                margin-right: 5px;
             }
             
             .crown {
                 right: 4px;
-                font-size: 16px;
-                width: 20px;
-                height: 20px;
+                font-size: 14px;
+                width: 18px;
+                height: 18px;
             }
         }
+
+        /* 弹窗手机端适配 */
+        @media (max-width: 767px) {
+            .modal-content {
+                padding: 24px;
+                margin: 20px;
+            }
+            
+            .stats-modal-content {
+                padding: 32px 24px;
+                margin: 20px;
+            }
+            
+            .switch-title {
+                font-size: 24px;
+            }
+            
+            .countdown {
+                font-size: 60px;
+            }
+            
+            .player-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1610,7 +1660,10 @@
                     </div>
                 </div>
             </div>
-            <button class="pk-home-btn" onclick="returnToHome()">返回主页</button>
+            <button class="pk-home-btn" onclick="returnToHome()">
+                <span class="btn-icon">🌱</span>
+                返回主页
+            </button>
         </div>
     </div>
 
@@ -2032,6 +2085,20 @@
             initDatabase(); // 初始化数据库连接
         });
 
+        // 监听屏幕方向变化
+        window.addEventListener('resize', function() {
+            const learningPage = document.getElementById('learning-page');
+            if (learningPage.style.display === 'flex') {
+                if (window.innerHeight > window.innerWidth) {
+                    learningPage.classList.add('portrait');
+                    learningPage.classList.remove('landscape');
+                } else {
+                    learningPage.classList.add('landscape');
+                    learningPage.classList.remove('portrait');
+                }
+            }
+        });
+
         // 初始化主页
         function initializeHomePage() {
             // 模式选择事件
@@ -2115,7 +2182,17 @@
             // 切换到学习页面
             document.body.className = 'learning-page'; // 设置学习页面样式
             document.getElementById('home').style.display = 'none';
-            document.getElementById('learning-page').style.display = 'flex';
+            const learningPage = document.getElementById('learning-page');
+            learningPage.style.display = 'flex';
+            
+            // 根据屏幕方向添加对应的类
+            if (window.innerHeight > window.innerWidth) {
+                learningPage.classList.add('portrait');
+                learningPage.classList.remove('landscape');
+            } else {
+                learningPage.classList.add('landscape');
+                learningPage.classList.remove('portrait');
+            }
             
             // 渲染钢琴键盘
             renderPianoKeyboard();
