@@ -204,6 +204,20 @@
             background: #1E7E34;
         }
 
+        .end-btn {
+            background: #FF3B30;
+            box-shadow: 0 4px 16px rgba(255, 59, 48, 0.3);
+        }
+
+        .end-btn:hover {
+            background: #D70015;
+            box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4);
+        }
+
+        .end-btn:active {
+            background: #A50E15;
+        }
+
         /* 第三排：钢琴键盘区域 (40%高度) */
         .third-row {
             height: 40vh;
@@ -466,6 +480,37 @@
             .section-content {
                 margin-top: 16px;
             }
+
+            /* 主页平板端适配 */
+            .mode-cards {
+                gap: 12px;
+            }
+            
+            .mode-card {
+                width: 120px;
+                padding: 16px;
+            }
+            
+            .mode-icon {
+                font-size: 28px;
+            }
+            
+            .mode-name {
+                font-size: 15px;
+            }
+            
+            .question-options {
+                gap: 10px;
+            }
+            
+            .question-option {
+                padding: 14px 16px;
+                min-width: 70px;
+            }
+            
+            .option-number {
+                font-size: 20px;
+            }
         }
 
         /* 手机端适配 */
@@ -553,12 +598,750 @@
                 margin-top: 12px;
             }
         }
+
+        /* 主页新增组件的样式 */
+        .mode-selection, .question-selection {
+            margin-bottom: 32px;
+        }
+
+        .selection-title {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            letter-spacing: -0.24px;
+        }
+
+        /* 模式选择卡片 */
+        .mode-cards {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            width: 140px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-card.selected {
+            border-color: #007AFF;
+            background: rgba(0, 122, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
+        }
+
+        .mode-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .mode-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1D1D1F;
+            margin-bottom: 4px;
+            letter-spacing: -0.24px;
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        /* 题目数量选择 */
+        .question-options {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .question-option {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            min-width: 80px;
+        }
+
+        .question-option:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .question-option.selected {
+            border-color: #007AFF;
+            background: rgba(0, 122, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .question-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .option-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-bottom: 4px;
+            letter-spacing: -0.24px;
+        }
+
+        .option-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .question-option.disabled .option-number,
+        .question-option.disabled .option-label {
+            color: #999;
+        }
+
+        /* Toast 提示样式 */
+        .toast {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(28, 28, 30, 0.95);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(10px);
+        }
+
+        /* 模态弹窗基础样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        /* 结束确认弹窗样式 */
+        .modal-content {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-bottom: 12px;
+            letter-spacing: -0.24px;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cancel-btn {
+            background: #F2F2F7;
+            color: #1D1D1F;
+            flex: 3;
+        }
+
+        .cancel-btn:hover {
+            background: #E5E5EA;
+        }
+
+        .confirm-btn {
+            background: #FF3B30;
+            color: #ffffff;
+            flex: 7;
+        }
+
+        .confirm-btn:hover {
+            background: #D70015;
+        }
+
+        /* 统计弹窗样式 */
+        .stats-modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show .stats-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .stats-header {
+            margin-bottom: 32px;
+        }
+
+        .stats-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-icon {
+            font-size: 48px;
+        }
+
+        .stats-details {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F2F2F7;
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stats-row .stats-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stats-row .stats-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1D1D1F;
+        }
+
+        .stats-home-btn {
+            background: #34C759;
+            color: #ffffff;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .stats-home-btn:hover {
+            background: #0056CC;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn-icon {
+            font-size: 18px;
+            animation: grow 2s ease-in-out infinite;
+        }
+
+        @keyframes grow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* PK模式玩家切换页面 */
+        .player-switch-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+
+        .player-switch-page.show {
+            display: flex;
+        }
+
+        .switch-content {
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .player-avatars {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 32px;
+        }
+
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: flyIn 0.6s ease-out;
+        }
+
+        .player-avatar.left {
+            animation-delay: 0.2s;
+        }
+
+        .player-avatar.right {
+            animation-delay: 0.4s;
+        }
+
+        .vs-icon {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes flyIn {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .switch-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .countdown {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .skip-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .skip-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* PK结算页面 */
+        .pk-result-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9997;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .pk-result-page.show {
+            display: flex;
+        }
+
+        .pk-result-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .pk-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-bottom: 32px;
+            letter-spacing: -0.28px;
+        }
+
+        .players-comparison {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .player-result {
+            flex: 1;
+            background: #F8F9FA;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #E9ECEF;
+            position: relative;
+            padding-right: 40px; /* 为皇冠留出空间 */
+            gap: 16px;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-item .stat-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            width: 90px;
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .stat-item .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-right: 8px; /* 与皇冠保持距离 */
+            flex: 1;
+            text-align: right;
+        }
+
+        .crown {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            animation: rotate 2s linear infinite;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes rotate {
+            from { transform: translateY(-50%) rotateY(0deg); }
+            to { transform: translateY(-50%) rotateY(360deg); }
+        }
+
+        .pk-home-btn {
+            background: #007AFF;
+            color: #ffffff;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+        }
+
+        .pk-home-btn:hover {
+            background: #0056CC;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+        }
+
+        /* 主页平板端适配 */
+        .mode-cards {
+            gap: 12px;
+        }
+        
+        .mode-card {
+            width: 120px;
+            padding: 16px;
+        }
+        
+        .mode-icon {
+            font-size: 28px;
+        }
+        
+        .mode-name {
+            font-size: 15px;
+        }
+        
+        .question-options {
+            gap: 10px;
+        }
+        
+        .question-option {
+            padding: 14px 16px;
+            min-width: 70px;
+        }
+        
+        .option-number {
+            font-size: 20px;
+        }
+
+        /* 主页手机端适配 */
+        #home {
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .mode-cards {
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .mode-card {
+            width: 200px;
+            padding: 20px;
+        }
+        
+        .question-options {
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .question-option {
+            padding: 12px 16px;
+            min-width: 60px;
+        }
+        
+        .option-number {
+            font-size: 18px;
+        }
+        
+        .selection-title {
+            font-size: 18px;
+        }
+
+        /* 弹窗手机端适配 */
+        .modal-content {
+            padding: 24px;
+            margin: 20px;
+        }
+        
+        .stats-modal-content {
+            padding: 32px 24px;
+            margin: 20px;
+        }
+        
+        .pk-result-content {
+            padding: 24px;
+            margin: 20px;
+        }
+        
+        .players-comparison {
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .switch-title {
+            font-size: 24px;
+        }
+        
+        .countdown {
+            font-size: 60px;
+        }
+        
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+        }
+        
+        /* 手机端皇冠优化 */
+        @media (max-width: 767px) {
+            .stat-item {
+                padding-right: 35px;
+                gap: 12px;
+                padding: 12px 0;
+            }
+            
+            .stat-item .stat-label {
+                width: 70px;
+                font-size: 13px;
+            }
+            
+            .stat-item .stat-value {
+                font-size: 15px;
+                margin-right: 6px;
+            }
+            
+            .crown {
+                right: 4px;
+                font-size: 16px;
+                width: 20px;
+                height: 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="home">
-        <h1 style="color: #ffffff; font-size: 34px; font-weight: 700; letter-spacing: -0.41px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">五线谱简谱对照学习</h1>
-        <button onclick="startLearning()">开始学习</button>
+        <h1 style="color: #ffffff; font-size: 34px; font-weight: 700; letter-spacing: -0.41px; margin-bottom: 32px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">五线谱简谱对照学习</h1>
+        
+        <!-- 模式选择区域 -->
+        <div class="mode-selection">
+            <h2 class="selection-title">选择学习模式</h2>
+            <div class="mode-cards">
+                <div class="mode-card" data-mode="practice">
+                    <div class="mode-icon">📚</div>
+                    <div class="mode-name">练习模式</div>
+                    <div class="mode-desc">自主练习，提升技能</div>
+                </div>
+                <div class="mode-card" data-mode="pk">
+                    <div class="mode-icon">⚔️</div>
+                    <div class="mode-name">PK模式</div>
+                    <div class="mode-desc">双人对战，竞技比拼</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 题目数量选择区域 -->
+        <div class="question-selection">
+            <h2 class="selection-title">选择题目数量</h2>
+            <div class="question-options">
+                <div class="question-option" data-count="30">
+                    <div class="option-number">30</div>
+                    <div class="option-label">道题</div>
+                </div>
+                <div class="question-option" data-count="60">
+                    <div class="option-number">60</div>
+                    <div class="option-label">道题</div>
+                </div>
+                <div class="question-option disabled" data-count="endless">
+                    <div class="option-number">∞</div>
+                    <div class="option-label">无尽模式</div>
+                </div>
+            </div>
+        </div>
+
+        <button id="startBtn" onclick="startLearning()">开始学习</button>
     </div>
 
     <div id="learning-page">
@@ -607,6 +1390,7 @@
             <div class="buttons-section">
                 <button id="confirmBtn" class="control-btn confirm-btn">确认</button>
                 <button id="nextBtn" class="control-btn next-btn">下一道</button>
+                <button id="endBtn" class="control-btn end-btn">结束</button>
             </div>
         </div>
 
@@ -618,7 +1402,131 @@
         </div>
     </div>
 
+    <!-- Toast 提示组件 -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- 结束确认弹窗 -->
+    <div id="endConfirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">提前结束练习？</h3>
+            <p class="modal-text">已完成 <span id="currentProgress">0</span>/<span id="totalProgress">0</span>，确认将丢失未答题进度</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn" onclick="closeEndConfirmModal()">取消</button>
+                <button class="modal-btn confirm-btn" onclick="confirmEndPractice()">确认结束</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统计结果弹窗 -->
+    <div id="statsModal" class="modal-overlay">
+        <div class="stats-modal-content">
+            <div class="stats-header">
+                <h3 class="stats-title">练习完成！</h3>
+                <div class="stats-icon">🎉</div>
+            </div>
+            <div class="stats-details">
+                <div class="stats-row">
+                    <span class="stats-label">总题数</span>
+                    <span class="stats-value" id="finalTotalCount">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">正确数</span>
+                    <span class="stats-value" id="finalCorrectCount">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">准确率</span>
+                    <span class="stats-value" id="finalAccuracyRate">0%</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">平均反应时间</span>
+                    <span class="stats-value" id="finalAvgReactionTime">0.0s</span>
+                </div>
+            </div>
+            <button class="stats-home-btn" onclick="returnToHome()">
+                <span class="btn-icon">🌱</span>
+                返回主页
+            </button>
+        </div>
+    </div>
+
+    <!-- PK模式玩家切换页面 -->
+    <div id="playerSwitchPage" class="player-switch-page">
+        <div class="switch-content">
+            <div class="player-avatars">
+                <div class="player-avatar left">👤</div>
+                <div class="vs-icon">VS</div>
+                <div class="player-avatar right">👤</div>
+            </div>
+            <h2 class="switch-title">玩家2准备中...</h2>
+            <div class="countdown" id="switchCountdown">3</div>
+            <button class="skip-btn" onclick="skipCountdown()">跳过</button>
+        </div>
+    </div>
+
+    <!-- PK模式结算页面 -->
+    <div id="pkResultPage" class="pk-result-page">
+        <div class="pk-result-content">
+            <h2 class="pk-title">对战结果</h2>
+            <div class="players-comparison">
+                <div class="player-result">
+                    <h3 class="player-name">玩家1</h3>
+                    <div class="player-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">总题数</span>
+                            <span class="stat-value" id="p1TotalCount">0</span>
+                            <span class="crown" id="p1TotalCrown"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">正确数</span>
+                            <span class="stat-value" id="p1CorrectCount">0</span>
+                            <span class="crown" id="p1CorrectCrown"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">准确率</span>
+                            <span class="stat-value" id="p1AccuracyRate">0%</span>
+                            <span class="crown" id="p1AccuracyCrown"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">平均反应</span>
+                            <span class="stat-value" id="p1AvgReactionTime">0.0s</span>
+                            <span class="crown" id="p1ReactionCrown"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="player-result">
+                    <h3 class="player-name">玩家2</h3>
+                    <div class="player-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">总题数</span>
+                            <span class="stat-value" id="p2TotalCount">0</span>
+                            <span class="crown" id="p2TotalCrown"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">正确数</span>
+                            <span class="stat-value" id="p2CorrectCount">0</span>
+                            <span class="crown" id="p2CorrectCrown"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">准确率</span>
+                            <span class="stat-value" id="p2AccuracyRate">0%</span>
+                            <span class="crown" id="p2AccuracyCrown"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">平均反应</span>
+                            <span class="stat-value" id="p2AvgReactionTime">0.0s</span>
+                            <span class="crown" id="p2ReactionCrown"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="pk-home-btn" onclick="returnToHome()">返回主页</button>
+        </div>
+    </div>
+
     <script>
+        // 全局变量
         let isPaused = false;
         let currentNote = null;
         let previousNote = null;
@@ -627,11 +1535,25 @@
         let audioContext = null;
         let autoNextTimer = null;
         
+        // 游戏模式和设置
+        let gameMode = null; // 'practice' 或 'pk'
+        let questionCount = null; // 30, 60, 或 'endless'
+        let currentQuestionIndex = 0;
+        let maxQuestions = 0;
+        
         // 统计变量
         let totalQuestions = 0;
         let correctAnswers = 0;
         let reactionTimes = []; // 存储每次反应时间
         let questionStartTime = null; // 题目开始时间
+        let pauseStartTime = null; // 暂停开始时间
+        let totalPauseTime = 0; // 当前题目的总暂停时间
+
+        // PK模式变量
+        let currentPlayer = 1; // 1 或 2
+        let player1Stats = { total: 0, correct: 0, reactionTimes: [] };
+        let player2Stats = { total: 0, correct: 0, reactionTimes: [] };
+        let switchCountdownTimer = null;
 
         const notes = [
             // 高音区 F4到B6
@@ -666,6 +1588,122 @@
             { abc: "F,",    jianpu: "4", octave: 3, pianoKey: "F3" },
             { abc: "G,",    jianpu: "5", octave: 3, pianoKey: "G3" }
         ];
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeHomePage();
+        });
+
+        // 初始化主页
+        function initializeHomePage() {
+            // 模式选择事件
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    gameMode = this.dataset.mode;
+                    
+                    // 更新题目数量选择状态
+                    updateQuestionOptions();
+                });
+            });
+
+            // 题目数量选择事件
+            document.querySelectorAll('.question-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (this.classList.contains('disabled')) return;
+                    
+                    document.querySelectorAll('.question-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    questionCount = this.dataset.count;
+                });
+            });
+        }
+
+        // 更新题目数量选择状态
+        function updateQuestionOptions() {
+            const endlessOption = document.querySelector('[data-count="endless"]');
+            
+            if (gameMode === 'practice') {
+                endlessOption.classList.remove('disabled');
+            } else {
+                endlessOption.classList.add('disabled');
+                if (questionCount === 'endless') {
+                    endlessOption.classList.remove('selected');
+                    questionCount = null;
+                }
+            }
+        }
+
+        // Toast 提示功能
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 开始学习
+        function startLearning() {
+            // 验证选择
+            if (!gameMode) {
+                showToast('请先选择学习模式');
+                return;
+            }
+            
+            if (!questionCount) {
+                showToast('请先选择题目数量');
+                return;
+            }
+
+            // 初始化游戏状态
+            initializeGame();
+            
+            // 切换到学习页面
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('learning-page').style.display = 'flex';
+            
+            // 渲染钢琴键盘
+            renderPianoKeyboard();
+            
+            // 初始化时将键盘滚动到中央C位置
+            setTimeout(() => {
+                scrollToCenterC();
+            }, 100);
+            
+            // 开始第一道题
+            startNewNote();
+        }
+
+        // 初始化游戏
+        function initializeGame() {
+            currentQuestionIndex = 0;
+            totalQuestions = 0;
+            correctAnswers = 0;
+            reactionTimes = [];
+            
+            // 重置暂停相关变量
+            pauseStartTime = null;
+            totalPauseTime = 0;
+            
+            if (questionCount === 'endless') {
+                maxQuestions = Infinity;
+            } else {
+                maxQuestions = parseInt(questionCount);
+            }
+            
+            if (gameMode === 'pk') {
+                currentPlayer = 1;
+                player1Stats = { total: 0, correct: 0, reactionTimes: [] };
+                player2Stats = { total: 0, correct: 0, reactionTimes: [] };
+                maxQuestions = parseInt(questionCount); // PK模式不支持无尽模式
+            }
+        }
 
         // 生成完整88键钢琴键盘数据
         function generateFullPianoKeys() {
@@ -721,16 +1759,16 @@
         // 获取黑键相对于前一个白键的偏移量
         function getBlackKeyOffset(noteName) {
             switch(noteName) {
-                case 'C#': return 32;  // 4 * 8px
-                case 'D#': return 40;  // 5 * 8px
-                case 'F#': return 32;  // 4 * 8px
-                case 'G#': return 36;  // 4.5 * 8px
-                case 'A#': return 40;  // 5 * 8px
+                case 'C#': return 32;
+                case 'D#': return 40;
+                case 'F#': return 32;
+                case 'G#': return 36;
+                case 'A#': return 40;
                 default: return 32;
             }
         }
 
-        // 钢琴键盘数据 - 现在使用生成的完整键盘
+        // 钢琴键盘数据
         const pianoKeys = generateFullPianoKeys();
 
         // 初始化音频上下文
@@ -771,24 +1809,11 @@
 
             // 音量包络
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01); // 提高到两倍音量
+            gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
             gainNode.gain.exponentialRampToValueAtTime(0.06, audioContext.currentTime + 1.5);
 
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 1.5);
-        }
-
-        function startLearning() {
-            document.getElementById('home').style.display = 'none';
-            document.getElementById('learning-page').style.display = 'flex';
-            renderPianoKeyboard();
-            
-            // 初始化时将键盘滚动到中央C位置
-            setTimeout(() => {
-                scrollToCenterC();
-            }, 100); // 延迟一点确保DOM渲染完成
-            
-            startNewNote();
         }
 
         // 渲染钢琴键盘
@@ -802,11 +1827,9 @@
                 keyElement.className = 'white-key';
                 keyElement.dataset.note = key.note;
                 
-                // 确保所有白键都有文字标签
                 const labelText = key.label || key.note;
                 keyElement.textContent = labelText;
                 
-                // 为中央C添加特殊样式
                 if (key.isMiddleC) {
                     keyElement.classList.add('middle-c');
                 }
@@ -815,12 +1838,11 @@
                 pianoElement.appendChild(keyElement);
             });
 
-            // 再渲染黑键，使其位于白键上方
+            // 再渲染黑键
             pianoKeys.filter(key => key.type === 'black').forEach(key => {
                 const keyElement = document.createElement('div');
                 keyElement.className = 'black-key';
                 keyElement.dataset.note = key.note;
-                // 使用音乐符号♯替代#
                 const displayLabel = key.label.replace('#', '♯');
                 keyElement.textContent = displayLabel;
                 keyElement.style.left = `${key.position}px`;
@@ -831,17 +1853,13 @@
 
         // 处理键盘点击
         function handleKeyClick(e, note) {
-            e.stopPropagation(); // 防止触发页面事件
+            e.stopPropagation();
 
             if (isPaused || !currentNote || hasShownJianpu) return;
 
-            // 播放按键音频
             playPianoNote(note);
-
-            // 清除之前的选择
             clearKeyHighlights();
 
-            // 高亮选中的按键
             const keyElement = document.querySelector(`[data-note="${note}"]`);
             keyElement.classList.add('key-selected');
             selectedKey = note;
@@ -858,10 +1876,8 @@
         function checkAnswer() {
             const correctKey = currentNote.pianoKey;
             
-            // 播放正确答案的音频
             playPianoNote(correctKey);
             
-            // 如果用户已选择
             if (selectedKey) {
                 const keyElement = document.querySelector(`[data-note="${selectedKey}"]`);
                 if (selectedKey === correctKey) {
@@ -871,7 +1887,6 @@
                 } else {
                     keyElement.classList.remove('key-selected');
                     keyElement.classList.add('key-incorrect');
-                    // 同时显示正确的按键
                     const correctElement = document.querySelector(`[data-note="${correctKey}"]`);
                     if (correctElement) {
                         correctElement.classList.add('key-correct');
@@ -879,7 +1894,6 @@
                     return false;
                 }
             } else {
-                // 如果用户未选择，显示正确答案为红色
                 const correctElement = document.querySelector(`[data-note="${correctKey}"]`);
                 if (correctElement) {
                     correctElement.classList.add('key-incorrect');
@@ -918,10 +1932,13 @@
             document.getElementById('staff').innerHTML = '';
             document.getElementById('jianpu').innerHTML = '';
             
-            // 重置状态
             selectedKey = null;
             hasShownJianpu = false;
             clearKeyHighlights();
+            
+            // 重置暂停时间
+            totalPauseTime = 0;
+            pauseStartTime = null;
             
             currentNote = getRandomNote();
             previousNote = currentNote;
@@ -929,17 +1946,14 @@
             const clef = currentNote.octave >= 4 ? 'treble' : 'bass';
             const abcNotation = `L:1/4\nK:C clef=${clef}\n${currentNote.abc}`;
             ABCJS.renderAbc("staff", abcNotation, { 
-                scale: 2.5, // 使用更合理的缩放比例
+                scale: 2.5,
                 responsive: "resize",
                 staffwidth: 180,
                 paddingleft: 55,
                 add_classes: true
             });
 
-            // 滚动键盘到当前音符位置
             scrollToPianoKey(currentNote.pianoKey);
-            
-            // 记录题目开始时间
             questionStartTime = Date.now();
         }
 
@@ -951,16 +1965,12 @@
                 const keyRect = keyElement.getBoundingClientRect();
                 const containerRect = pianoContainer.getBoundingClientRect();
                 
-                // 检查按键是否已经在可视区域内
                 const isKeyVisible = keyRect.left >= containerRect.left && 
                                    keyRect.right <= containerRect.right;
                 
-                // 只有当按键不在可视区域时才滚动
                 if (!isKeyVisible) {
-                    // 计算滚动位置，使键位居中显示
                     const scrollLeft = keyElement.offsetLeft - (containerRect.width / 2) + (keyRect.width / 2);
                     
-                    // 平滑滚动到位置
                     pianoContainer.scrollTo({
                         left: scrollLeft,
                         behavior: 'smooth'
@@ -976,10 +1986,8 @@
                 const pianoContainer = document.querySelector('.piano-container');
                 const containerRect = pianoContainer.getBoundingClientRect();
                 
-                // 计算滚动位置，使中央C居中显示
                 const scrollLeft = middleCElement.offsetLeft - (containerRect.width / 2) + (middleCElement.offsetWidth / 2);
                 
-                // 滚动到位置
                 pianoContainer.scrollTo({
                     left: scrollLeft,
                     behavior: 'smooth'
@@ -987,15 +1995,15 @@
             }
         }
 
+        // 键盘事件
         document.addEventListener('keydown', (e) => {
             if(e.code === 'Space') {
-                e.preventDefault(); // 防止页面滚动
+                e.preventDefault();
                 togglePause();
             }
         });
         
         document.getElementById('learning-page').addEventListener('click', (e) => {
-            // 如果点击的不是钢琴键和按钮，则触发暂停
             if (!e.target.classList.contains('white-key') && 
                 !e.target.classList.contains('black-key') &&
                 !e.target.classList.contains('control-btn')) {
@@ -1003,38 +2011,73 @@
             }
         });
 
-        // 添加按钮事件监听器
+        // 按钮事件监听器
         document.getElementById('confirmBtn').addEventListener('click', confirmAnswer);
         document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+        document.getElementById('endBtn').addEventListener('click', showEndConfirmModal);
 
         // 确认答案
         function confirmAnswer() {
             if (isPaused || !currentNote || hasShownJianpu) return;
             
-            // 计算反应时间
             if (questionStartTime) {
-                const reactionTime = Date.now() - questionStartTime;
+                const reactionTime = Date.now() - questionStartTime - totalPauseTime;
                 reactionTimes.push(reactionTime);
+                
+                // PK模式记录到对应玩家
+                if (gameMode === 'pk') {
+                    if (currentPlayer === 1) {
+                        player1Stats.reactionTimes.push(reactionTime);
+                    } else {
+                        player2Stats.reactionTimes.push(reactionTime);
+                    }
+                }
             }
             
-            // 显示简谱
             document.getElementById('jianpu').innerHTML = generateJianpu(currentNote.jianpu, currentNote.octave);
             hasShownJianpu = true;
             
-            // 检查答案并播放音频
             const isCorrect = checkAnswer();
             
-            // 更新统计
             totalQuestions++;
             if (isCorrect) {
                 correctAnswers++;
             }
+            
+            // PK模式更新对应玩家统计
+            if (gameMode === 'pk') {
+                if (currentPlayer === 1) {
+                    player1Stats.total++;
+                    if (isCorrect) player1Stats.correct++;
+                } else {
+                    player2Stats.total++;
+                    if (isCorrect) player2Stats.correct++;
+                }
+            }
+            
             updateStats();
             
-            // 如果答案正确，1秒后自动下一道
+            currentQuestionIndex++;
+            
+            // 检查是否完成
+            if (currentQuestionIndex >= maxQuestions) {
+                if (gameMode === 'pk' && currentPlayer === 1) {
+                    // PK模式玩家1完成，切换到玩家2
+                    setTimeout(() => {
+                        switchToPlayer2();
+                    }, 1000);
+                } else {
+                    // 练习模式完成或PK模式玩家2完成
+                    setTimeout(() => {
+                        showStatsModal();
+                    }, 1000);
+                }
+                return;
+            }
+            
             if (isCorrect) {
                 autoNextTimer = setTimeout(() => {
-                    if (!isPaused) { // 确保没有被暂停
+                    if (!isPaused) {
                         nextQuestion();
                     }
                 }, 1000);
@@ -1043,8 +2086,291 @@
 
         // 下一道题
         function nextQuestion() {
-            clearTimeout(autoNextTimer); // 清除自动下一道的定时器
+            clearTimeout(autoNextTimer);
+            
+            // 如果还没有显示简谱，说明用户直接点击了下一道，需要统计
+            if (!hasShownJianpu) {
+                // 计算反应时间（如果有的话）
+                if (questionStartTime) {
+                    const reactionTime = Date.now() - questionStartTime - totalPauseTime;
+                    reactionTimes.push(reactionTime);
+                    
+                    // PK模式记录到对应玩家
+                    if (gameMode === 'pk') {
+                        if (currentPlayer === 1) {
+                            player1Stats.reactionTimes.push(reactionTime);
+                        } else {
+                            player2Stats.reactionTimes.push(reactionTime);
+                        }
+                    }
+                }
+                
+                // 显示简谱
+                document.getElementById('jianpu').innerHTML = generateJianpu(currentNote.jianpu, currentNote.octave);
+                hasShownJianpu = true;
+                
+                // 检查答案（用户没选择，算错误）
+                checkAnswer();
+                
+                // 更新统计
+                totalQuestions++;
+                // 不增加正确数，因为用户没有选择
+                
+                // PK模式更新对应玩家统计
+                if (gameMode === 'pk') {
+                    if (currentPlayer === 1) {
+                        player1Stats.total++;
+                        // 不增加correct，因为用户没有选择
+                    } else {
+                        player2Stats.total++;
+                        // 不增加correct，因为用户没有选择
+                    }
+                }
+                
+                updateStats();
+                currentQuestionIndex++;
+                
+                // 检查是否完成
+                if (currentQuestionIndex >= maxQuestions) {
+                    if (gameMode === 'pk' && currentPlayer === 1) {
+                        // PK模式玩家1完成，切换到玩家2
+                        setTimeout(() => {
+                            switchToPlayer2();
+                        }, 1000);
+                    } else {
+                        // 练习模式完成或PK模式玩家2完成
+                        setTimeout(() => {
+                            showStatsModal();
+                        }, 1000);
+                    }
+                    return;
+                }
+                
+                // 延迟1秒后开始下一题
+                setTimeout(() => {
+                    startNewNote();
+                }, 1000);
+            } else {
+                // 已经显示过简谱，直接开始下一题
+                startNewNote();
+            }
+        }
+
+        // 显示结束确认弹窗
+        function showEndConfirmModal() {
+            if (isPaused) return;
+            
+            document.getElementById('currentProgress').textContent = currentQuestionIndex;
+            document.getElementById('totalProgress').textContent = maxQuestions === Infinity ? '∞' : maxQuestions;
+            
+            // PK模式下显示不同的文案
+            const modalTitle = document.querySelector('#endConfirmModal .modal-title');
+            const modalText = document.querySelector('#endConfirmModal .modal-text');
+            const confirmBtn = document.querySelector('#endConfirmModal .confirm-btn');
+            
+            if (gameMode === 'pk' && currentPlayer === 1) {
+                modalTitle.textContent = '提前结束当前轮次？';
+                modalText.innerHTML = `已完成 <span id="currentProgress">${currentQuestionIndex}</span>/<span id="totalProgress">${maxQuestions === Infinity ? '∞' : maxQuestions}</span>，确认将切换到玩家2`;
+                confirmBtn.textContent = '确认切换';
+            } else if (gameMode === 'pk' && currentPlayer === 2) {
+                modalTitle.textContent = '提前结束对战？';
+                modalText.innerHTML = `已完成 <span id="currentProgress">${currentQuestionIndex}</span>/<span id="totalProgress">${maxQuestions === Infinity ? '∞' : maxQuestions}</span>，确认将结束对战`;
+                confirmBtn.textContent = '确认结束';
+            } else {
+                modalTitle.textContent = '提前结束练习？';
+                modalText.innerHTML = `已完成 <span id="currentProgress">${currentQuestionIndex}</span>/<span id="totalProgress">${maxQuestions === Infinity ? '∞' : maxQuestions}</span>，确认将丢失未答题进度`;
+                confirmBtn.textContent = '确认结束';
+            }
+            
+            document.getElementById('endConfirmModal').classList.add('show');
+        }
+
+        // 关闭结束确认弹窗
+        function closeEndConfirmModal() {
+            document.getElementById('endConfirmModal').classList.remove('show');
+        }
+
+        // 确认结束练习
+        function confirmEndPractice() {
+            closeEndConfirmModal();
+            
+            // PK模式下，如果是玩家1点击结束，切换到玩家2
+            if (gameMode === 'pk' && currentPlayer === 1) {
+                switchToPlayer2();
+            } else {
+                // 练习模式或PK模式玩家2结束，显示统计
+                showStatsModal();
+            }
+        }
+
+        // 显示统计弹窗
+        function showStatsModal() {
+            if (gameMode === 'pk') {
+                showPKResult();
+            } else {
+                // 练习模式统计
+                document.getElementById('finalTotalCount').textContent = totalQuestions;
+                document.getElementById('finalCorrectCount').textContent = correctAnswers;
+                
+                const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+                document.getElementById('finalAccuracyRate').textContent = accuracy + '%';
+                
+                const avgReaction = reactionTimes.length > 0 ? 
+                    (reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length / 1000).toFixed(1) : 
+                    '0.0';
+                document.getElementById('finalAvgReactionTime').textContent = avgReaction + 's';
+                
+                document.getElementById('statsModal').classList.add('show');
+            }
+        }
+
+        // PK模式切换到玩家2
+        function switchToPlayer2() {
+            document.getElementById('playerSwitchPage').classList.add('show');
+            
+            let countdown = 3;
+            document.getElementById('switchCountdown').textContent = countdown;
+            
+            switchCountdownTimer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    document.getElementById('switchCountdown').textContent = countdown;
+                } else {
+                    clearInterval(switchCountdownTimer);
+                    startPlayer2();
+                }
+            }, 1000);
+        }
+
+        // 跳过倒计时
+        function skipCountdown() {
+            clearInterval(switchCountdownTimer);
+            startPlayer2();
+        }
+
+        // 开始玩家2的游戏
+        function startPlayer2() {
+            document.getElementById('playerSwitchPage').classList.remove('show');
+            
+            // 重置游戏状态
+            currentPlayer = 2;
+            currentQuestionIndex = 0;
+            totalQuestions = 0;
+            correctAnswers = 0;
+            reactionTimes = [];
+            
+            // 重置暂停相关变量
+            pauseStartTime = null;
+            totalPauseTime = 0;
+            
+            // 更新统计显示
+            updateStats();
+            
+            // 开始新题目
             startNewNote();
+        }
+
+        // 显示PK结果
+        function showPKResult() {
+            // 计算统计数据
+            const p1Accuracy = player1Stats.total > 0 ? Math.round((player1Stats.correct / player1Stats.total) * 100) : 0;
+            const p2Accuracy = player2Stats.total > 0 ? Math.round((player2Stats.correct / player2Stats.total) * 100) : 0;
+            
+            const p1AvgReaction = player1Stats.reactionTimes.length > 0 ? 
+                (player1Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player1Stats.reactionTimes.length / 1000).toFixed(1) : 
+                '0.0';
+            const p2AvgReaction = player2Stats.reactionTimes.length > 0 ? 
+                (player2Stats.reactionTimes.reduce((sum, time) => sum + time, 0) / player2Stats.reactionTimes.length / 1000).toFixed(1) : 
+                '0.0';
+            
+            // 填充数据
+            document.getElementById('p1TotalCount').textContent = player1Stats.total;
+            document.getElementById('p1CorrectCount').textContent = player1Stats.correct;
+            document.getElementById('p1AccuracyRate').textContent = p1Accuracy + '%';
+            document.getElementById('p1AvgReactionTime').textContent = p1AvgReaction + 's';
+            
+            document.getElementById('p2TotalCount').textContent = player2Stats.total;
+            document.getElementById('p2CorrectCount').textContent = player2Stats.correct;
+            document.getElementById('p2AccuracyRate').textContent = p2Accuracy + '%';
+            document.getElementById('p2AvgReactionTime').textContent = p2AvgReaction + 's';
+            
+            // 清除所有皇冠
+            document.querySelectorAll('.crown').forEach(crown => crown.textContent = '');
+            
+            // 每一项独立比较并添加皇冠
+            
+            // 1. 总题数比较
+            if (player1Stats.total > player2Stats.total) {
+                document.getElementById('p1TotalCrown').textContent = '👑';
+            } else if (player2Stats.total > player1Stats.total) {
+                document.getElementById('p2TotalCrown').textContent = '👑';
+            }
+            // 平局时都不显示皇冠
+            
+            // 2. 正确数比较
+            if (player1Stats.correct > player2Stats.correct) {
+                document.getElementById('p1CorrectCrown').textContent = '👑';
+            } else if (player2Stats.correct > player1Stats.correct) {
+                document.getElementById('p2CorrectCrown').textContent = '👑';
+            }
+            // 平局时都不显示皇冠
+            
+            // 3. 准确率比较
+            if (p1Accuracy > p2Accuracy) {
+                document.getElementById('p1AccuracyCrown').textContent = '👑';
+            } else if (p2Accuracy > p1Accuracy) {
+                document.getElementById('p2AccuracyCrown').textContent = '👑';
+            }
+            // 平局时都不显示皇冠
+            
+            // 4. 平均反应时间比较（越小越好）
+            const p1ReactionFloat = parseFloat(p1AvgReaction);
+            const p2ReactionFloat = parseFloat(p2AvgReaction);
+            
+            // 只有当两个玩家都有有效反应时间时才比较
+            if (p1ReactionFloat > 0 && p2ReactionFloat > 0) {
+                if (p1ReactionFloat < p2ReactionFloat) {
+                    document.getElementById('p1ReactionCrown').textContent = '👑';
+                } else if (p2ReactionFloat < p1ReactionFloat) {
+                    document.getElementById('p2ReactionCrown').textContent = '👑';
+                }
+                // 平局时都不显示皇冠
+            } else if (p1ReactionFloat > 0 && p2ReactionFloat === 0) {
+                // 只有玩家1有反应时间
+                document.getElementById('p1ReactionCrown').textContent = '👑';
+            } else if (p2ReactionFloat > 0 && p1ReactionFloat === 0) {
+                // 只有玩家2有反应时间
+                document.getElementById('p2ReactionCrown').textContent = '👑';
+            }
+            
+            document.getElementById('pkResultPage').classList.add('show');
+        }
+
+        // 返回主页
+        function returnToHome() {
+            // 隐藏所有页面和弹窗
+            document.getElementById('learning-page').style.display = 'none';
+            document.getElementById('statsModal').classList.remove('show');
+            document.getElementById('pkResultPage').classList.remove('show');
+            document.getElementById('home').style.display = 'block';
+            
+            // 重置所有状态
+            gameMode = null;
+            questionCount = null;
+            currentQuestionIndex = 0;
+            totalQuestions = 0;
+            correctAnswers = 0;
+            reactionTimes = [];
+            currentPlayer = 1;
+            player1Stats = { total: 0, correct: 0, reactionTimes: [] };
+            player2Stats = { total: 0, correct: 0, reactionTimes: [] };
+            
+            // 清除选择状态
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.question-option').forEach(o => o.classList.remove('selected'));
+            
+            // 重置无尽模式状态
+            document.querySelector('[data-count="endless"]').classList.add('disabled');
         }
 
         // 暂停/继续切换
@@ -1054,9 +2380,16 @@
             
             if (isPaused) {
                 pauseIcon.style.display = 'block';
-                clearTimeout(autoNextTimer); // 暂停时清除自动下一道定时器
+                clearTimeout(autoNextTimer);
+                // 记录暂停开始时间
+                pauseStartTime = Date.now();
             } else {
                 pauseIcon.style.display = 'none';
+                // 计算暂停时长并累加
+                if (pauseStartTime) {
+                    totalPauseTime += Date.now() - pauseStartTime;
+                    pauseStartTime = null;
+                }
             }
         }
 
@@ -1068,12 +2401,24 @@
             const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
             document.getElementById('accuracyRate').textContent = accuracy + '%';
             
-            // 计算平均反应时间
             const avgReaction = reactionTimes.length > 0 ? 
                 (reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length / 1000).toFixed(1) : 
                 '0.0';
             document.getElementById('avgReactionTime').textContent = avgReaction + 's';
         }
+
+        // 点击蒙层关闭弹窗
+        document.getElementById('statsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                returnToHome();
+            }
+        });
+
+        document.getElementById('pkResultPage').addEventListener('click', function(e) {
+            if (e.target === this) {
+                returnToHome();
+            }
+        });
     </script>
 </body>
 </html>
