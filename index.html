@@ -418,7 +418,7 @@
             transform: translateY(2px);
         }
 
-        /* 暂停图标样式 */
+        /* 暂停文案样式 */
         .pause-icon {
             position: absolute;
             top: 50%;
@@ -426,7 +426,7 @@
             transform: translate(-50%, -50%);
             background: rgba(28, 28, 30, 0.92);
             color: #ffffff;
-            padding: 32px;
+            padding: 24px 32px;
             border-radius: 20px;
             text-align: center;
             z-index: 1000;
@@ -435,13 +435,8 @@
             -webkit-backdrop-filter: blur(20px);
         }
 
-        .pause-symbol {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
         .pause-text {
-            font-size: 17px;
+            font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.24px;
         }
@@ -648,18 +643,22 @@
             }
             
             .second-row {
-                height: 12vh;
-                min-height: 80px;
+                height: 8vh;
+                min-height: 60px;
             }
             
             .buttons-section {
-                gap: 8px;
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 1fr 1fr;
+                gap: 6px;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: 1fr;
+            }
+            
+            .control-btn {
+                font-size: 13px;
             }
             
             .third-row {
-                height: 23vh;
+                height: 25vh;
                 min-height: 140px;
             }
             
@@ -1472,12 +1471,12 @@
             <div class="question-selection">
                 <h2 class="selection-title">选择题目数量</h2>
                 <div class="question-options">
-                    <div class="question-option" data-count="30">
-                        <div class="option-number">30</div>
+                    <div class="question-option" data-count="15">
+                        <div class="option-number">15</div>
                         <div class="option-label">道题</div>
                     </div>
-                    <div class="question-option" data-count="60">
-                        <div class="option-number">60</div>
+                    <div class="question-option" data-count="30">
+                        <div class="option-number">30</div>
                         <div class="option-label">道题</div>
                     </div>
                     <div class="question-option disabled" data-count="endless">
@@ -1492,9 +1491,8 @@
     </div>
 
     <div id="learning-page">
-        <!-- 暂停图标 -->
+        <!-- 暂停提示 -->
         <div id="pauseIcon" class="pause-icon" style="display: none;">
-            <div class="pause-symbol">⏸️</div>
             <div class="pause-text">已暂停</div>
         </div>
         
@@ -2560,7 +2558,8 @@
 
         // 确认答案
         function confirmAnswer() {
-            if (isPaused || !currentNote || hasShownJianpu) return;
+            if (isPaused) return;
+            if (!currentNote || hasShownJianpu) return;
             
             let reactionTime = 0;
             if (questionStartTime) {
@@ -2648,6 +2647,7 @@
 
         // 下一道题
         function nextQuestion() {
+            if (isPaused) return;
             clearTimeout(autoNextTimer);
             
             // 如果还没有显示简谱，说明用户直接点击了下一道，需要统计
@@ -2756,6 +2756,11 @@
             } else if (window.gameMode === 'pk' && window.currentPlayer === 2) {
                 modalTitle.textContent = '提前结束对战？';
                 modalText.innerHTML = `已完成 <span id="currentProgress">${window.currentQuestionIndex}</span>/<span id="totalProgress">${window.maxQuestions === Infinity ? '∞' : window.maxQuestions}</span>，确认将结束对战`;
+                confirmBtn.textContent = '确认结束';
+            } else if (window.questionCount === 'endless') {
+                // 无尽模式只需要简单确认
+                modalTitle.textContent = '结束练习？';
+                modalText.innerHTML = ``;
                 confirmBtn.textContent = '确认结束';
             } else {
                 modalTitle.textContent = '提前结束练习？';
