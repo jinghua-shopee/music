@@ -1,0 +1,53 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <view class="title">五线谱简谱学习器</view>
+  
+  <!-- 模式选择 -->
+  <view class="section">
+    <view class="section-title">选择学习模式</view>
+    <view class="mode-cards">
+      <view class="card mode-card {{selectedMode === 'practice' ? 'selected' : ''}}" 
+            bindtap="selectMode" data-mode="practice">
+        <view class="card-title">练习模式</view>
+        <view class="card-desc">专注学习，稳步提升</view>
+      </view>
+      
+      <view class="card mode-card {{selectedMode === 'pk' ? 'selected' : ''}}" 
+            bindtap="selectMode" data-mode="pk">
+        <view class="card-title">PK模式</view>
+        <view class="card-desc">双人对战，竞技乐趣</view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 题目数量选择 -->
+  <view class="section" wx:if="{{selectedMode}}">
+    <view class="section-title">选择题目数量</view>
+    <view class="count-options">
+      <view class="card count-option {{selectedCount === '30' ? 'selected' : ''}}" 
+            bindtap="selectCount" data-count="30">
+        <text>30道题</text>
+      </view>
+      <view class="card count-option {{selectedCount === '60' ? 'selected' : ''}}" 
+            bindtap="selectCount" data-count="60">
+        <text>60道题</text>
+      </view>
+      <view class="card count-option {{selectedCount === 'endless' ? 'selected' : ''}}" 
+            bindtap="selectCount" data-count="endless" wx:if="{{selectedMode !== 'pk'}}">
+        <text>无尽模式</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 开始按钮 -->
+  <view class="start-section" wx:if="{{selectedMode && selectedCount}}">
+    <button class="btn start-btn" bindtap="startLearning">
+      开始{{selectedMode === 'practice' ? '练习' : 'PK'}}
+    </button>
+  </view>
+  
+  <!-- 提示信息 -->
+  <view class="info" wx:if="{{message}}">
+    <text>{{message}}</text>
+  </view>
+</view> 

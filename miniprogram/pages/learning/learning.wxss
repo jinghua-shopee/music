@@ -1,0 +1,216 @@
+/* pages/learning/learning.wxss */
+.learning-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 20rpx;
+}
+
+.header .title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.header .progress {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.staff-section, .jianpu-section {
+  background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  text-align: center;
+  min-height: 120rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.jianpu-section {
+  background: linear-gradient(135deg, #A8EDEA 0%, #FED6E3 100%);
+}
+
+.section-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #1D3557;
+  margin-bottom: 15rpx;
+}
+
+.staff-display, .jianpu-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.note-display {
+  text-align: center;
+}
+
+.note-text {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #1D3557;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.note-abc {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.jianpu-text {
+  font-size: 80rpx;
+  font-weight: bold;
+  color: #1D3557;
+}
+
+.placeholder {
+  font-size: 24rpx;
+  color: rgba(29, 53, 87, 0.6);
+}
+
+.controls {
+  display: flex;
+  gap: 15rpx;
+  justify-content: center;
+}
+
+.control-btn {
+  flex: 1;
+  max-width: 160rpx;
+  font-size: 24rpx;
+  padding: 20rpx 10rpx;
+}
+
+.next-btn {
+  background: #34C759;
+}
+
+.end-btn {
+  background: #FF3B30;
+}
+
+.piano-section {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.piano-container {
+  white-space: nowrap;
+}
+
+.piano-keyboard {
+  display: inline-flex;
+  gap: 8rpx;
+  padding: 10rpx;
+}
+
+.piano-key {
+  background: #fff;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 30rpx 15rpx;
+  text-align: center;
+  transition: all 0.2s;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80rpx;
+}
+
+.piano-key.selected {
+  background: #007AFF;
+  color: white;
+  border-color: #007AFF;
+}
+
+.key-label {
+  font-size: 20rpx;
+  font-weight: bold;
+}
+
+.middle-c {
+  font-size: 16rpx;
+  color: #FF3B30;
+  margin-top: 5rpx;
+}
+
+.stats {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12rpx;
+  padding: 15rpx;
+  display: flex;
+  justify-content: space-around;
+  font-size: 22rpx;
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin: 40rpx;
+  max-width: 500rpx;
+  width: 80%;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20rpx;
+  color: #1D3557;
+}
+
+.modal-content {
+  font-size: 28rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  color: #666;
+  flex: 1;
+}
+
+.confirm-btn {
+  background: #FF3B30;
+  color: white;
+  flex: 1;
+} 

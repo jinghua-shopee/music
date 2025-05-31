@@ -1,0 +1,47 @@
+{
+  "name": "music-learning-uniapp",
+  "version": "1.0.0",
+  "description": "五线谱简谱学习器 - uni-app版本",
+  "main": "main.js",
+  "scripts": {
+    "serve": "npm run dev:h5",
+    "build": "npm run build:h5",
+    "dev:h5": "cross-env NODE_ENV=development UNI_PLATFORM=h5 vue-cli-service uni-serve",
+    "build:h5": "cross-env NODE_ENV=production UNI_PLATFORM=h5 vue-cli-service uni-build",
+    "dev:mp-weixin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin vue-cli-service uni-build --watch",
+    "build:mp-weixin": "cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin vue-cli-service uni-build"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "2.0.2-4060620250520001",
+    "@dcloudio/uni-cli-i18n": "^2.0.2-4060620250520001",
+    "@dcloudio/uni-h5": "2.0.2-4060620250520001",
+    "@dcloudio/uni-mp-weixin": "2.0.2-4060620250520001",
+    "vue": "^2.6.11",
+    "vuex": "^3.2.0"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-cli-shared": "2.0.2-4060620250520001",
+    "@dcloudio/uni-template-compiler": "2.0.2-4060620250520001",
+    "@dcloudio/vue-cli-plugin-uni": "2.0.2-4060620250520001",
+    "@dcloudio/webpack-uni-mp-loader": "2.0.2-4060620250520001",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "babel-plugin-import": "^1.11.0",
+    "cross-env": "^7.0.2",
+    "mini-css-extract-plugin": "^0.9.0",
+    "postcss-comment": "^2.0.0",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "keywords": [
+    "uni-app",
+    "音乐学习",
+    "五线谱",
+    "简谱"
+  ],
+  "author": "",
+  "license": "MIT",
+  "browserslist": [
+    "Android >= 4.4",
+    "ios >= 9"
+  ]
+}

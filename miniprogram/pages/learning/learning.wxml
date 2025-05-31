@@ -1,0 +1,92 @@
+<!--pages/learning/learning.wxml-->
+<view class="learning-container">
+  <!-- 标题和进度 -->
+  <view class="header">
+    <view class="title">{{gameMode === 'practice' ? '练习模式' : 'PK模式'}}</view>
+    <view class="progress" wx:if="{{questionCount !== 'endless'}}">
+      {{currentQuestionIndex + 1}} / {{questionCount}}
+    </view>
+    <view class="progress" wx:else>
+      已完成 {{currentQuestionIndex + 1}} 道题
+    </view>
+  </view>
+
+  <!-- 五线谱显示区域 -->
+  <view class="staff-section card">
+    <view class="section-title">五线谱</view>
+    <view class="staff-display">
+      <view wx:if="{{currentNote}}" class="note-display">
+        <!-- 这里可以显示五线谱图片或Canvas -->
+        <text class="note-text">{{currentNote.name}}{{currentNote.octave}}</text>
+        <text class="note-abc">{{currentNote.abc}}</text>
+      </view>
+      <view wx:else class="placeholder">点击开始学习</view>
+    </view>
+  </view>
+
+  <!-- 简谱显示区域 -->
+  <view class="jianpu-section card">
+    <view class="section-title">简谱</view>
+    <view class="jianpu-display">
+      <view wx:if="{{hasShownJianpu && currentNote}}" class="jianpu-text">
+        {{currentNote.jianpu}}
+      </view>
+      <view wx:else class="placeholder">
+        {{hasShownJianpu ? '点击开始学习' : '请先选择答案'}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 控制按钮 -->
+  <view class="controls">
+    <button class="btn control-btn" bindtap="pauseResume">
+      {{isPaused ? '继续' : '暂停'}}
+    </button>
+    <button class="btn control-btn next-btn" 
+            disabled="{{!hasShownJianpu}}" 
+            bindtap="nextQuestion">
+      {{hasShownJianpu ? '下一道' : '请先答题'}}
+    </button>
+    <button class="btn control-btn end-btn" bindtap="showEndConfirm">
+      结束
+    </button>
+  </view>
+
+  <!-- 简化版钢琴键盘 -->
+  <view class="piano-section">
+    <view class="section-title">选择音符</view>
+    <scroll-view class="piano-container" scroll-x>
+      <view class="piano-keyboard">
+        <view wx:for="{{pianoKeys}}" 
+              wx:key="note"
+              wx:if="{{!item.isBlack}}"
+              class="piano-key white-key {{selectedKey === item.note ? 'selected' : ''}}"
+              bindtap="selectPianoKey" 
+              data-key="{{item}}">
+          <text class="key-label">{{item.name}}</text>
+          <text wx:if="{{item.isMiddleC}}" class="middle-c">C4</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats card">
+    <text>正确率: {{accuracyRate}}%</text>
+    <text>已答题: {{totalQuestions}}</text>
+  </view>
+</view>
+
+<!-- 结束确认弹窗 -->
+<view wx:if="{{showEndDialog}}" class="modal-overlay" bindtap="hideEndConfirm">
+  <view class="modal">
+    <view class="modal-title">确认结束</view>
+    <view class="modal-content">
+      确定要结束当前{{gameMode === 'practice' ? '练习' : 'PK'}}吗？
+    </view>
+    <view class="modal-buttons">
+      <button class="btn cancel-btn" bindtap="hideEndConfirm">取消</button>
+      <button class="btn confirm-btn" bindtap="endLearning">确定</button>
+    </view>
+  </view>
+</view> 
