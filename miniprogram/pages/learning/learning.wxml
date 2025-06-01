@@ -21,8 +21,8 @@
     <!-- 五线谱和简谱显示区域 -->
     <view class="note-display">
       <view class="staff-area card">
-        <text class="area-title">五线谱</text>
-        <staff note="{{currentNote}}" />
+        <text class="area-title">五线谱 (Canvas渲染)</text>
+        <vex-staff note="{{currentNote}}" showDebugInfo="{{showDebugInfo}}" />
       </view>
       
       <view class="jianpu-area card">

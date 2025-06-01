@@ -12,6 +12,18 @@
   position: relative;
   width: 100%;
   height: 160rpx;
+  margin-left: 80rpx; /* 为高音谱号留出空间 */
+}
+
+/* 高音谱号 */
+.treble-clef {
+  position: absolute;
+  left: 20rpx;
+  top: 0rpx;
+  font-size: 120rpx;
+  color: #333;
+  line-height: 1;
+  z-index: 3;
 }
 
 .staff-line {
@@ -22,15 +34,15 @@
   left: 0;
 }
 
-.staff-line:nth-child(1) { top: 20rpx; }
-.staff-line:nth-child(2) { top: 40rpx; }
-.staff-line:nth-child(3) { top: 60rpx; }
-.staff-line:nth-child(4) { top: 80rpx; }
-.staff-line:nth-child(5) { top: 100rpx; }
+.staff-line:nth-child(2) { top: 20rpx; }  /* 第一线 */
+.staff-line:nth-child(3) { top: 40rpx; }  /* 第二线 */
+.staff-line:nth-child(4) { top: 60rpx; }  /* 第三线 */
+.staff-line:nth-child(5) { top: 80rpx; }  /* 第四线 */
+.staff-line:nth-child(6) { top: 100rpx; } /* 第五线 */
 
 .note-container {
   position: absolute;
-  left: 50%;
+  left: 60%;
   transform: translateX(-50%);
   width: 60rpx;
   height: 160rpx;
@@ -42,17 +54,37 @@
   transform: translateX(-50%);
   width: 40rpx;
   height: 30rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 2;
 }
 
 .note-head {
-  font-size: 48rpx;
+  font-size: 40rpx;
   color: #333;
   font-weight: bold;
   line-height: 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.note-stem {
+  position: absolute;
+  width: 2rpx;
+  height: 60rpx;
+  background: #333;
+  right: 2rpx;
+  top: -15rpx;
+}
+
+/* 加线容器 */
+.ledger-line-container {
+  position: absolute;
+  width: 60rpx;
+  height: 30rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
 }
 
 .ledger-line {
@@ -63,7 +95,6 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
 }
 
 .placeholder {

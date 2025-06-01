@@ -1,13 +1,22 @@
 <view class="staff-container">
   <view class="staff-lines">
+    <!-- 高音谱号 -->
+    <view class="treble-clef">𝄞</view>
+    
     <!-- 五线谱线条 -->
     <view class="staff-line" wx:for="{{5}}" wx:key="index"></view>
     
     <!-- 音符 -->
     <view wx:if="{{note}}" class="note-container">
-      <view class="note {{getNoteClass(note.staffPosition)}}" style="{{getNoteStyle(note.staffPosition)}}">
-        <view class="note-head">♪</view>
-        <view wx:if="{{needsLedgerLine(note.staffPosition)}}" class="ledger-line"></view>
+      <!-- 加线（如果需要） -->
+      <view wx:if="{{needsLedgerLine}}" class="ledger-line-container">
+        <view class="ledger-line"></view>
+      </view>
+      
+      <!-- 音符 -->
+      <view class="note {{noteClass}}" style="{{noteStyle}}">
+        <view class="note-head">●</view>
+        <view class="note-stem"></view>
       </view>
     </view>
   </view>

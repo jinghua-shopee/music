@@ -1,136 +1,146 @@
 .piano-container {
   width: 100%;
-  padding: 24rpx;
-  background: #f5f5f5;
-  border-radius: 16rpx;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 20rpx 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12rpx;
 }
 
-.piano-keys {
+.piano-keyboard {
   position: relative;
-  display: flex;
   height: 200rpx;
-  background: #333;
+  width: 1100rpx; /* 总宽度以容纳所有键 */
+  margin: 0 auto;
+  background: #f8f9fa;
   border-radius: 8rpx;
-  overflow: hidden;
+  box-shadow: inset 0 4rpx 8rpx rgba(0,0,0,0.1);
 }
 
-/* 白键 */
-.white-key {
-  flex: 1;
-  background: #ffffff;
-  border: 2rpx solid #ddd;
-  border-right: 1rpx solid #ccc;
+.piano-key {
+  position: absolute;
+  border-radius: 0 0 8rpx 8rpx;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 16rpx;
-  transition: all 0.2s ease;
-  position: relative;
+  padding-bottom: 20rpx;
+  user-select: none;
 }
 
-.white-key:last-child {
-  border-right: 2rpx solid #ddd;
+/* 白键样式 */
+.white-key {
+  width: 48rpx;
+  height: 180rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2rpx solid #e0e0e0;
+  border-radius: 0 0 8rpx 8rpx;
+  box-shadow: 0 4rpx 8rpx rgba(0,0,0,0.1);
+  z-index: 1;
 }
 
+.white-key:active,
 .white-key.selected {
-  background: #e3f2fd;
-  border-color: #2196f3;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
   transform: translateY(4rpx);
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.2);
 }
 
 .white-key.highlight {
-  background: #c8e6c9;
-  border-color: #4caf50;
-  animation: pulse 1s ease-in-out infinite alternate;
+  background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+  border-color: #28a745;
+  box-shadow: 0 0 20rpx rgba(40, 167, 69, 0.5);
+  animation: highlight-pulse 1s ease-in-out infinite alternate;
 }
 
-/* 黑键 */
+/* 黑键样式 */
 .black-key {
-  position: absolute;
-  width: 60rpx;
+  width: 32rpx;
   height: 120rpx;
-  background: #333;
-  border: 2rpx solid #222;
-  border-radius: 0 0 8rpx 8rpx;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 8rpx;
-  transition: all 0.2s ease;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  border: 2rpx solid #1a252f;
+  border-radius: 0 0 6rpx 6rpx;
+  box-shadow: 0 6rpx 12rpx rgba(0,0,0,0.3);
   z-index: 2;
 }
 
+.black-key:active,
 .black-key.selected {
-  background: #1976d2;
-  border-color: #0d47a1;
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
   transform: translateY(4rpx);
+  box-shadow: 0 3rpx 6rpx rgba(0,0,0,0.4);
 }
 
 .black-key.highlight {
-  background: #388e3c;
-  border-color: #2e7d32;
-  animation: pulse 1s ease-in-out infinite alternate;
+  background: linear-gradient(180deg, #ffc107 0%, #fd7e14 100%);
+  border-color: #ffc107;
+  box-shadow: 0 0 20rpx rgba(255, 193, 7, 0.6);
+  animation: highlight-pulse 1s ease-in-out infinite alternate;
 }
 
-/* 黑键位置 */
-.black-key-1 {
-  left: calc(12.5% - 30rpx);
-}
-
-.black-key-2 {
-  left: calc(25% - 30rpx);
-}
-
-.black-key-4 {
-  left: calc(50% - 30rpx);
-}
-
-.black-key-5 {
-  left: calc(62.5% - 30rpx);
-}
-
-.black-key-6 {
-  left: calc(75% - 30rpx);
-}
-
-/* 键标签 */
+/* 按键标签 */
 .key-label {
   font-size: 20rpx;
+  font-weight: 600;
   color: #666;
-  font-weight: 500;
+  pointer-events: none;
+  text-align: center;
+  line-height: 1;
+}
+
+.white-key.selected .key-label,
+.white-key:active .key-label {
+  color: white;
 }
 
 .black-key .key-label {
-  color: #ccc;
+  color: #bdc3c7;
   font-size: 18rpx;
 }
 
-.white-key.selected .key-label {
-  color: #2196f3;
-  font-weight: 600;
+.black-key.selected .key-label,
+.black-key:active .key-label {
+  color: white;
 }
 
-.black-key.selected .key-label {
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.white-key.highlight .key-label {
-  color: #4caf50;
-  font-weight: 600;
-}
-
+.white-key.highlight .key-label,
 .black-key.highlight .key-label {
-  color: #ffffff;
-  font-weight: 600;
+  color: white;
+  font-weight: 700;
 }
 
-/* 脉动动画 */
-@keyframes pulse {
-  from {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+/* 高亮动画 */
+@keyframes highlight-pulse {
+  0% { 
+    box-shadow: 0 0 20rpx rgba(40, 167, 69, 0.5);
+    transform: translateY(0);
   }
-  to {
-    box-shadow: 0 0 0 10rpx rgba(76, 175, 80, 0);
+  100% { 
+    box-shadow: 0 0 30rpx rgba(40, 167, 69, 0.8);
+    transform: translateY(-2rpx);
+  }
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 750rpx) {
+  .piano-keyboard {
+    width: 1000rpx;
+  }
+  
+  .white-key {
+    width: 44rpx;
+  }
+  
+  .black-key {
+    width: 28rpx;
+  }
+  
+  .key-label {
+    font-size: 18rpx;
+  }
+  
+  .black-key .key-label {
+    font-size: 16rpx;
   }
 } 

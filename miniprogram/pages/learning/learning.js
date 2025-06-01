@@ -1,4 +1,6 @@
 const app = getApp()
+const { musicParser } = require('../../utils/musicParser.js')
+const { audioManager } = require('../../utils/audioUtils.js')
 
 Page({
   data: {

@@ -57,12 +57,14 @@
   display: flex;
   gap: 24rpx;
   margin-bottom: 40rpx;
+  flex-wrap: wrap;
 }
 
 .control-btn {
   flex: 1;
   padding: 24rpx;
   font-size: 28rpx;
+  min-width: 120rpx;
 }
 
 /* 钢琴区域 */
