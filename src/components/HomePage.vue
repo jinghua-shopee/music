@@ -1,54 +1,54 @@
 <template>
-	<div class="home-page">
-		<div class="home-content">
-			<h1 class="title">🎵 五线谱简谱对照学习</h1>
+	<view class="home-page">
+		<view class="home-content">
+			<text class="title">🎵 五线谱简谱对照学习</text>
 			
 			<!-- 模式选择区域 -->
-			<div class="mode-selection">
-				<h2 class="selection-title">选择学习模式</h2>
-				<div class="mode-cards">
-					<div 
+			<view class="mode-selection">
+				<text class="selection-title">选择学习模式</text>
+				<view class="mode-cards">
+					<view 
 						class="mode-card" 
 						:class="{ active: selectedMode === 'practice' }"
 						@click="selectMode('practice')"
 					>
-						<div class="mode-icon">📚</div>
-						<div class="mode-name">练习模式</div>
-						<div class="mode-desc">自主练习，提升技能</div>
-					</div>
-					<div 
+						<view class="mode-icon">📚</view>
+						<view class="mode-name">练习模式</view>
+						<view class="mode-desc">自主练习，提升技能</view>
+					</view>
+					<view 
 						class="mode-card" 
 						:class="{ active: selectedMode === 'pk' }"
 						@click="selectMode('pk')"
 					>
-						<div class="mode-icon">⚔️</div>
-						<div class="mode-name">PK模式</div>
-						<div class="mode-desc">双人对战，竞技比拼</div>
-					</div>
-				</div>
-			</div>
+						<view class="mode-icon">⚔️</view>
+						<view class="mode-name">PK模式</view>
+						<view class="mode-desc">双人对战，竞技比拼</view>
+					</view>
+				</view>
+			</view>
 
 			<!-- 题目数量选择区域 -->
-			<div class="question-selection">
-				<h2 class="selection-title">选择题目数量</h2>
-				<div class="question-options">
-					<div 
+			<view class="question-selection">
+				<text class="selection-title">选择题目数量</text>
+				<view class="question-options">
+					<view 
 						class="question-option" 
 						:class="{ active: selectedCount === 15 }"
 						@click="selectCount(15)"
 					>
-						<div class="option-number">15</div>
-						<div class="option-label">道题</div>
-					</div>
-					<div 
+						<view class="option-number">15</view>
+						<view class="option-label">道题</view>
+					</view>
+					<view 
 						class="question-option" 
 						:class="{ active: selectedCount === 30 }"
 						@click="selectCount(30)"
 					>
-						<div class="option-number">30</div>
-						<div class="option-label">道题</div>
-					</div>
-					<div 
+						<view class="option-number">30</view>
+						<view class="option-label">道题</view>
+					</view>
+					<view 
 						class="question-option" 
 						:class="{ 
 							active: selectedCount === 'endless',
@@ -56,11 +56,11 @@
 						}"
 						@click="selectCount('endless')"
 					>
-						<div class="option-number">∞</div>
-						<div class="option-label">无尽模式</div>
-					</div>
-				</div>
-			</div>
+						<view class="option-number">∞</view>
+						<view class="option-label">无尽模式</view>
+					</view>
+				</view>
+			</view>
 
 			<button 
 				class="start-btn" 
@@ -69,13 +69,13 @@
 			>
 				开始学习
 			</button>
-		</div>
+		</view>
 		
 		<!-- Toast提示 -->
-		<div v-if="showToast" class="toast">
+		<view v-if="showToast" class="toast">
 			{{ toastMessage }}
-		</div>
-	</div>
+		</view>
+	</view>
 </template>
 
 <script>
@@ -146,8 +146,10 @@
 				// 初始化游戏状态
 				this.startGame(gameData)
 				
-				// 跳转到学习页面
-				this.$emit('navigate', 'learning')
+				// 使用uni-app导航
+				uni.navigateTo({
+					url: '/pages/learning/learning'
+				})
 			},
 			
 			showToastMessage(message) {

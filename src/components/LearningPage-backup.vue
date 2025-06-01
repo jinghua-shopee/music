@@ -554,7 +554,9 @@
 			},
 			
 			goBack() {
-				this.$emit('navigate', 'home')
+				uni.navigateBack({
+					delta: 1
+				})
 			},
 			
 			switchToPlayer2() {

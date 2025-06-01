@@ -1,8 +1,8 @@
 <template>
-	<div class="piano-container">
-		<div class="piano-keyboard">
-			<div class="white-keys">
-				<div 
+	<view class="piano-container">
+		<view class="piano-keyboard">
+			<view class="white-keys">
+				<view 
 					v-for="key in whiteKeys" 
 					:key="key.id"
 					class="white-key"
@@ -13,11 +13,11 @@
 					}"
 					@click="selectKey(key.id)"
 				>
-					<div class="key-label">{{ key.label }}</div>
-				</div>
-			</div>
-			<div class="black-keys">
-				<div 
+					<view class="key-label">{{ key.label }}</view>
+				</view>
+			</view>
+			<view class="black-keys">
+				<view 
 					v-for="key in blackKeys" 
 					:key="key.id"
 					class="black-key"
@@ -28,11 +28,11 @@
 					:style="{ left: key.position + '%' }"
 					@click="selectKey(key.id)"
 				>
-					<div class="key-label">{{ key.label }}</div>
-				</div>
-			</div>
-		</div>
-	</div>
+					<view class="key-label">{{ key.label }}</view>
+				</view>
+			</view>
+		</view>
+	</view>
 </template>
 
 <script>
@@ -113,48 +113,22 @@
 				console.log('Piano key selected:', keyId)
 				this.$emit('key-select', keyId)
 				
-				// 播放音符声音 (如果支持)
+				// 简化音效提示 - 在uni-app中使用振动反馈
 				this.playNote(keyId)
 			},
 			
-			// 播放音符声音
+			// 播放音符声音 - 使用uni-app的振动反馈
 			playNote(keyId) {
 				try {
-					// 使用Web Audio API播放简单的音调
-					if (window.AudioContext || window.webkitAudioContext) {
-						const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-						const oscillator = audioContext.createOscillator()
-						const gainNode = audioContext.createGain()
-						
-						// 根据音符计算频率
-						const frequency = this.getFrequency(keyId)
-						oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime)
-						oscillator.type = 'sine'
-						
-						// 设置音量和时长
-						gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-						gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
-						
-						oscillator.connect(gainNode)
-						gainNode.connect(audioContext.destination)
-						
-						oscillator.start(audioContext.currentTime)
-						oscillator.stop(audioContext.currentTime + 0.5)
+					// 在uni-app中使用振动反馈
+					if (uni && uni.vibrateShort) {
+						uni.vibrateShort({
+							type: 'light'
+						})
 					}
 				} catch (error) {
-					console.warn('Cannot play audio:', error)
+					console.warn('Cannot provide vibration feedback:', error)
 				}
-			},
-			
-			// 获取音符频率
-			getFrequency(keyId) {
-				// 基础频率映射 (C4 = 261.63 Hz)
-				const frequencies = {
-					'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'B3': 246.94,
-					'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
-					'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'B5': 987.77
-				}
-				return frequencies[keyId] || 440.00
 			}
 		}
 	}

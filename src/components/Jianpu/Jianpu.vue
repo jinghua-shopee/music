@@ -1,24 +1,24 @@
 <template>
-	<div class="jianpu-container">
-		<div v-if="note" class="jianpu-display">
-			<div v-if="show" class="jianpu-note">
-				<div class="octave-dots high" v-if="note.octave && note.octave > 4">
-					<span v-for="n in (note.octave - 4)" :key="'high-' + n" class="dot">●</span>
-				</div>
-				<div class="jianpu-number">{{ note.jianpu }}</div>
-				<div class="octave-dots low" v-if="note.octave && note.octave < 4">
-					<span v-for="n in (4 - note.octave)" :key="'low-' + n" class="dot">●</span>
-				</div>
-			</div>
-			<div v-else class="jianpu-placeholder">
-				<div class="question-mark">?</div>
-				<div class="hint">选择钢琴键后点击确认</div>
-			</div>
-		</div>
-		<div v-else class="empty-jianpu">
-			准备中...
-		</div>
-	</div>
+	<view class="jianpu-container">
+		<view v-if="note" class="jianpu-display">
+			<view v-if="show" class="jianpu-note">
+				<view class="octave-dots high" v-if="note.octave && note.octave > 4">
+					<text v-for="n in (note.octave - 4)" :key="'high-' + n" class="dot">●</text>
+				</view>
+				<view class="jianpu-number">{{ note.jianpu }}</view>
+				<view class="octave-dots low" v-if="note.octave && note.octave < 4">
+					<text v-for="n in (4 - note.octave)" :key="'low-' + n" class="dot">●</text>
+				</view>
+			</view>
+			<view v-else class="jianpu-placeholder">
+				<view class="question-mark">?</view>
+				<view class="hint">选择钢琴键后点击确认</view>
+			</view>
+		</view>
+		<view v-else class="empty-jianpu">
+			<text>准备中...</text>
+		</view>
+	</view>
 </template>
 
 <script>
