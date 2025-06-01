@@ -1,0 +1,13 @@
+<view class="jianpu-container">
+  <view wx:if="{{note && show}}" class="jianpu-note">
+    <text class="jianpu-number">{{note.jianpu}}</text>
+  </view>
+  
+  <view wx:elif="{{note && !show}}" class="jianpu-hidden">
+    <text class="question-mark">?</text>
+  </view>
+  
+  <view wx:else class="placeholder">
+    <text>等待简谱...</text>
+  </view>
+</view> 

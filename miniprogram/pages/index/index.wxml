@@ -1,0 +1,74 @@
+<view class="container">
+  <view class="home-content">
+    <text class="title">🎵 五线谱简谱对照学习</text>
+    
+    <!-- 模式选择区域 -->
+    <view class="mode-selection">
+      <text class="section-title">选择学习模式</text>
+      <view class="mode-cards">
+        <view 
+          class="mode-card {{selectedMode === 'practice' ? 'active' : ''}}" 
+          bindtap="selectMode"
+          data-mode="practice"
+        >
+          <view class="mode-icon">📚</view>
+          <view class="mode-name">练习模式</view>
+          <view class="mode-desc">自主练习，提升技能</view>
+        </view>
+        <view 
+          class="mode-card {{selectedMode === 'pk' ? 'active' : ''}}" 
+          bindtap="selectMode"
+          data-mode="pk"
+        >
+          <view class="mode-icon">⚔️</view>
+          <view class="mode-name">PK模式</view>
+          <view class="mode-desc">双人对战，竞技比拼</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 题目数量选择区域 -->
+    <view class="question-selection">
+      <text class="section-title">选择题目数量</text>
+      <view class="question-options">
+        <view 
+          class="question-option {{selectedCount === 15 ? 'active' : ''}}" 
+          bindtap="selectCount"
+          data-count="15"
+        >
+          <view class="option-number">15</view>
+          <view class="option-label">道题</view>
+        </view>
+        <view 
+          class="question-option {{selectedCount === 30 ? 'active' : ''}}" 
+          bindtap="selectCount"
+          data-count="30"
+        >
+          <view class="option-number">30</view>
+          <view class="option-label">道题</view>
+        </view>
+        <view 
+          class="question-option {{selectedCount === 'endless' ? 'active' : ''}} {{selectedMode === 'pk' ? 'disabled' : ''}}" 
+          bindtap="selectCount"
+          data-count="endless"
+        >
+          <view class="option-number">∞</view>
+          <view class="option-label">无尽模式</view>
+        </view>
+      </view>
+    </view>
+
+    <button 
+      class="btn btn-primary start-btn {{!canStart ? 'btn-disabled' : ''}}" 
+      bindtap="startLearning"
+      disabled="{{!canStart}}"
+    >
+      开始学习
+    </button>
+  </view>
+  
+  <!-- Toast提示 -->
+  <view wx:if="{{showToast}}" class="toast">
+    {{toastMessage}}
+  </view>
+</view> 

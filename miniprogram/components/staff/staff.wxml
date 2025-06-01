@@ -1,0 +1,18 @@
+<view class="staff-container">
+  <view class="staff-lines">
+    <!-- 五线谱线条 -->
+    <view class="staff-line" wx:for="{{5}}" wx:key="index"></view>
+    
+    <!-- 音符 -->
+    <view wx:if="{{note}}" class="note-container">
+      <view class="note {{getNoteClass(note.staffPosition)}}" style="{{getNoteStyle(note.staffPosition)}}">
+        <view class="note-head">♪</view>
+        <view wx:if="{{needsLedgerLine(note.staffPosition)}}" class="ledger-line"></view>
+      </view>
+    </view>
+  </view>
+  
+  <view wx:if="{{!note}}" class="placeholder">
+    <text>等待音符...</text>
+  </view>
+</view> 

@@ -1,0 +1,66 @@
+.jianpu-container {
+  width: 100%;
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 12rpx;
+  position: relative;
+}
+
+.jianpu-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120rpx;
+  height: 120rpx;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 50%;
+  box-shadow: 0 8rpx 24rpx rgba(79, 172, 254, 0.4);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.jianpu-number {
+  font-size: 64rpx;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+.jianpu-hidden {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120rpx;
+  height: 120rpx;
+  background: #f0f0f0;
+  border: 4rpx dashed #ccc;
+  border-radius: 50%;
+}
+
+.question-mark {
+  font-size: 64rpx;
+  font-weight: 700;
+  color: #999;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  font-size: 28rpx;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+} 

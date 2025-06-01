@@ -1,0 +1,136 @@
+.piano-container {
+  width: 100%;
+  padding: 24rpx;
+  background: #f5f5f5;
+  border-radius: 16rpx;
+}
+
+.piano-keys {
+  position: relative;
+  display: flex;
+  height: 200rpx;
+  background: #333;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+/* 白键 */
+.white-key {
+  flex: 1;
+  background: #ffffff;
+  border: 2rpx solid #ddd;
+  border-right: 1rpx solid #ccc;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16rpx;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.white-key:last-child {
+  border-right: 2rpx solid #ddd;
+}
+
+.white-key.selected {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  transform: translateY(4rpx);
+}
+
+.white-key.highlight {
+  background: #c8e6c9;
+  border-color: #4caf50;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+/* 黑键 */
+.black-key {
+  position: absolute;
+  width: 60rpx;
+  height: 120rpx;
+  background: #333;
+  border: 2rpx solid #222;
+  border-radius: 0 0 8rpx 8rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8rpx;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.black-key.selected {
+  background: #1976d2;
+  border-color: #0d47a1;
+  transform: translateY(4rpx);
+}
+
+.black-key.highlight {
+  background: #388e3c;
+  border-color: #2e7d32;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+/* 黑键位置 */
+.black-key-1 {
+  left: calc(12.5% - 30rpx);
+}
+
+.black-key-2 {
+  left: calc(25% - 30rpx);
+}
+
+.black-key-4 {
+  left: calc(50% - 30rpx);
+}
+
+.black-key-5 {
+  left: calc(62.5% - 30rpx);
+}
+
+.black-key-6 {
+  left: calc(75% - 30rpx);
+}
+
+/* 键标签 */
+.key-label {
+  font-size: 20rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.black-key .key-label {
+  color: #ccc;
+  font-size: 18rpx;
+}
+
+.white-key.selected .key-label {
+  color: #2196f3;
+  font-weight: 600;
+}
+
+.black-key.selected .key-label {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.white-key.highlight .key-label {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.black-key.highlight .key-label {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* 脉动动画 */
+@keyframes pulse {
+  from {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  to {
+    box-shadow: 0 0 0 10rpx rgba(76, 175, 80, 0);
+  }
+} 

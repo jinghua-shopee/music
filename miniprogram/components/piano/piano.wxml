@@ -1,0 +1,98 @@
+<view class="piano-container">
+  <view class="piano-keys">
+    <!-- 白键 -->
+    <view 
+      class="white-key {{selectedKey === 'c4' ? 'selected' : ''}} {{highlightKey === 'c4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="c4"
+    >
+      <text class="key-label">C4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'd4' ? 'selected' : ''}} {{highlightKey === 'd4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="d4"
+    >
+      <text class="key-label">D4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'e4' ? 'selected' : ''}} {{highlightKey === 'e4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="e4"
+    >
+      <text class="key-label">E4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'f4' ? 'selected' : ''}} {{highlightKey === 'f4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="f4"
+    >
+      <text class="key-label">F4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'g4' ? 'selected' : ''}} {{highlightKey === 'g4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="g4"
+    >
+      <text class="key-label">G4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'a4' ? 'selected' : ''}} {{highlightKey === 'a4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="a4"
+    >
+      <text class="key-label">A4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'b4' ? 'selected' : ''}} {{highlightKey === 'b4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="b4"
+    >
+      <text class="key-label">B4</text>
+    </view>
+    <view 
+      class="white-key {{selectedKey === 'c5' ? 'selected' : ''}} {{highlightKey === 'c5' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="c5"
+    >
+      <text class="key-label">C5</text>
+    </view>
+    
+    <!-- 黑键 -->
+    <view 
+      class="black-key black-key-1 {{selectedKey === 'cs4' ? 'selected' : ''}} {{highlightKey === 'cs4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="cs4"
+    >
+      <text class="key-label">C#4</text>
+    </view>
+    <view 
+      class="black-key black-key-2 {{selectedKey === 'ds4' ? 'selected' : ''}} {{highlightKey === 'ds4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="ds4"
+    >
+      <text class="key-label">D#4</text>
+    </view>
+    <view 
+      class="black-key black-key-4 {{selectedKey === 'fs4' ? 'selected' : ''}} {{highlightKey === 'fs4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="fs4"
+    >
+      <text class="key-label">F#4</text>
+    </view>
+    <view 
+      class="black-key black-key-5 {{selectedKey === 'gs4' ? 'selected' : ''}} {{highlightKey === 'gs4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="gs4"
+    >
+      <text class="key-label">G#4</text>
+    </view>
+    <view 
+      class="black-key black-key-6 {{selectedKey === 'as4' ? 'selected' : ''}} {{highlightKey === 'as4' && showAnswer ? 'highlight' : ''}}"
+      bindtap="selectKey"
+      data-key="as4"
+    >
+      <text class="key-label">A#4</text>
+    </view>
+  </view>
+</view> 

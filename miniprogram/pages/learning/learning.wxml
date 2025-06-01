@@ -1,0 +1,171 @@
+<view class="container">
+  <view class="learning-content">
+    <text class="title">🎹 {{pageTitle}}</text>
+    
+    <!-- 游戏信息 -->
+    <view class="game-info card">
+      <view class="info-row">
+        <text class="label">模式:</text>
+        <text class="value">{{gameModeText}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">进度:</text>
+        <text class="value">{{progressText}}</text>
+      </view>
+      <view wx:if="{{gameMode === 'pk'}}" class="info-row">
+        <text class="label">当前玩家:</text>
+        <text class="value">玩家{{currentPlayer}}</text>
+      </view>
+    </view>
+    
+    <!-- 五线谱和简谱显示区域 -->
+    <view class="note-display">
+      <view class="staff-area card">
+        <text class="area-title">五线谱</text>
+        <staff note="{{currentNote}}" />
+      </view>
+      
+      <view class="jianpu-area card">
+        <text class="area-title">简谱</text>
+        <jianpu note="{{currentNote}}" show="{{hasShownJianpu}}" />
+      </view>
+    </view>
+    
+    <!-- 控制按钮 -->
+    <view class="controls">
+      <button 
+        wx:if="{{!hasShownJianpu}}"
+        class="btn btn-primary control-btn" 
+        disabled="{{!selectedKey}}"
+        bindtap="confirmAnswer"
+      >
+        确认答案
+      </button>
+      <button 
+        wx:if="{{hasShownJianpu && !isGameCompleted}}"
+        class="btn btn-primary control-btn" 
+        bindtap="nextQuestion"
+      >
+        下一题
+      </button>
+      <button 
+        wx:if="{{isGameCompleted}}"
+        class="btn btn-primary control-btn" 
+        bindtap="showSummary"
+      >
+        查看总结
+      </button>
+      <button class="btn btn-danger control-btn" bindtap="handleEndGame">{{endButtonText}}</button>
+    </view>
+    
+    <!-- 钢琴键盘 -->
+    <view class="piano-area card">
+      <piano 
+        selectedKey="{{selectedKey}}" 
+        highlightKey="{{currentNote ? currentNote.pianoKey : ''}}"
+        showAnswer="{{hasShownJianpu}}"
+        bind:keyselect="selectKey"
+      />
+    </view>
+  </view>
+  
+  <!-- 学习总结弹窗 -->
+  <view wx:if="{{showSummaryModal}}" class="modal">
+    <view class="modal-content">
+      <view class="summary-header">
+        <view class="summary-icon">🎉</view>
+        <text class="summary-title">{{gameMode === 'pk' ? 'PK对战总结' : '学习总结'}}</text>
+      </view>
+      
+      <view wx:if="{{gameMode !== 'pk'}}" class="summary-stats">
+        <view class="stat-item">
+          <view class="stat-icon">📊</view>
+          <view class="stat-label">总题数</view>
+          <view class="stat-value">{{totalQuestions}}</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-icon">✅</view>
+          <view class="stat-label">正确数</view>
+          <view class="stat-value correct">{{correctAnswers}}</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-icon">❌</view>
+          <view class="stat-label">错误数</view>
+          <view class="stat-value wrong">{{wrongAnswers}}</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-icon">🎯</view>
+          <view class="stat-label">正确率</view>
+          <view class="stat-value">{{accuracyRate}}%</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-icon">⏱️</view>
+          <view class="stat-label">平均反应时间</view>
+          <view class="stat-value">{{averageReactionTime}}秒</view>
+        </view>
+      </view>
+      
+      <!-- PK模式对比 -->
+      <view wx:if="{{gameMode === 'pk'}}" class="pk-comparison">
+        <view class="pk-stats-grid">
+          <view class="pk-stat-row">
+            <view class="stat-header">正确率</view>
+            <view class="player-stat">
+              <text wx:if="{{player1AccuracyRate > player2AccuracyRate}}" class="crown">👑</text>
+              {{player1AccuracyRate}}%
+            </view>
+            <view class="vs-divider">VS</view>
+            <view class="player-stat">
+              <text wx:if="{{player2AccuracyRate > player1AccuracyRate}}" class="crown">👑</text>
+              {{player2AccuracyRate}}%
+            </view>
+          </view>
+          
+          <view class="pk-stat-row">
+            <view class="stat-header">平均时间</view>
+            <view class="player-stat">
+              <text wx:if="{{player1AverageReactionTime < player2AverageReactionTime && player1AverageReactionTime > 0}}" class="crown">👑</text>
+              {{player1AverageReactionTime}}秒
+            </view>
+            <view class="vs-divider">VS</view>
+            <view class="player-stat">
+              <text wx:if="{{player2AverageReactionTime < player1AverageReactionTime && player2AverageReactionTime > 0}}" class="crown">👑</text>
+              {{player2AverageReactionTime}}秒
+            </view>
+          </view>
+        </view>
+        
+        <view class="final-winner">
+          {{winnerText}}
+        </view>
+      </view>
+      
+      <view class="summary-actions">
+        <button class="btn btn-primary" bindtap="restartGame">再来一次</button>
+        <button class="btn btn-danger" bindtap="closeSummaryAndGoBack">返回首页</button>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 确认退出弹窗 -->
+  <view wx:if="{{showExitConfirm}}" class="modal">
+    <view class="modal-content">
+      <view class="exit-header">
+        <view class="exit-icon">🤔</view>
+        <text class="exit-title">{{gameMode === 'pk' ? '确认退出PK？' : '确认退出学习'}}</text>
+      </view>
+      <view class="exit-progress">
+        <view class="progress-circle">
+          <view class="progress-number">{{totalQuestions}}</view>
+          <view class="progress-label">已完成题数</view>
+        </view>
+      </view>
+      <text class="exit-message">您已经完成了 {{totalQuestions}} 道题，是否要退出并查看学习报告？</text>
+      <view class="exit-actions">
+        <button class="btn btn-primary" bindtap="exitWithReport">查看报告并退出</button>
+        <button class="btn btn-outline" bindtap="cancelExit">{{gameMode === 'pk' ? '继续PK' : '继续学习'}}</button>
+        <button class="btn btn-danger" bindtap="exitDirectly">直接退出</button>
+      </view>
+    </view>
+  </view>
+</view> 

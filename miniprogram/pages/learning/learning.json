@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "piano": "/components/piano/piano",
+    "staff": "/components/staff/staff",
+    "jianpu": "/components/jianpu/jianpu"
+  }
+} 

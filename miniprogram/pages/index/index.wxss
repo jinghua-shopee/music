@@ -1,0 +1,111 @@
+.home-content {
+  width: 100%;
+  max-width: 600rpx;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* 模式选择 */
+.mode-selection {
+  margin-bottom: 80rpx;
+}
+
+.mode-cards {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+
+.mode-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 24rpx;
+  padding: 40rpx 24rpx;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.mode-card.active {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-4rpx);
+  box-shadow: 0 16rpx 32rpx rgba(0, 0, 0, 0.2);
+}
+
+.mode-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.mode-name {
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.mode-desc {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+
+/* 题目数量选择 */
+.question-selection {
+  margin-bottom: 80rpx;
+}
+
+.question-options {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+
+.question-option {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 24rpx;
+  padding: 32rpx 16rpx;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.question-option.active {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-4rpx);
+  box-shadow: 0 16rpx 32rpx rgba(0, 0, 0, 0.2);
+}
+
+.question-option.disabled {
+  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.option-number {
+  color: #ffffff;
+  font-size: 48rpx;
+  font-weight: 700;
+  margin-bottom: 8rpx;
+}
+
+.option-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 24rpx;
+}
+
+/* 开始按钮 */
+.start-btn {
+  width: 100%;
+  padding: 32rpx;
+  font-size: 36rpx;
+  margin-top: 40rpx;
+}
+
+.start-btn.btn-disabled {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: none !important;
+} 
