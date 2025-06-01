@@ -59,8 +59,8 @@
     </view>
     
     <!-- 钢琴键盘 -->
-    <view class="piano-area card">
-      <piano 
+    <view class="piano-area card" style="padding: 5px;">
+      <piano style="padding: 0%;" 
         selectedKey="{{selectedKey}}" 
         highlightKey="{{currentNote ? currentNote.pianoKey : ''}}"
         showAnswer="{{hasShownJianpu}}"

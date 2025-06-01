@@ -34,7 +34,7 @@
 .note-display {
   display: flex;
   gap: 24rpx;
-  margin-bottom: 40rpx;
+  margin-bottom: 10rpx;
 }
 
 .staff-area,
@@ -56,7 +56,7 @@
 .controls {
   display: flex;
   gap: 24rpx;
-  margin-bottom: 40rpx;
+  margin-bottom: 10rpx;
   flex-wrap: wrap;
 }
 
@@ -69,7 +69,7 @@
 
 /* 钢琴区域 */
 .piano-area {
-  margin-bottom: 40rpx;
+  margin-bottom: 0rpx;
 }
 
 /* 总结弹窗 */
