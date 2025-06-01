@@ -2,17 +2,17 @@ import Vue from 'vue'
 import App from './App'
 import store from './store'
 
-// uni-app 兼容配置
 Vue.config.productionTip = false
 
-// 挂载全局方法
-Vue.prototype.$store = store
-
-App.mpType = 'app'
+console.log('Main.js loaded')
 
 const app = new Vue({
-  store,
-  ...App
+    store,
+    render: h => h(App)
 })
 
-app.$mount() 
+console.log('Vue app created, mounting...')
+
+app.$mount('#app')
+
+console.log('Vue app mounted!') 

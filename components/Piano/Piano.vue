@@ -163,24 +163,20 @@
 <style scoped>
 	.piano-container {
 		width: 100%;
-		height: 100%;
 		padding: 0;
 		margin: 0;
 		box-sizing: border-box;
 		overflow-x: auto;
-		display: flex;
-		align-items: stretch;
+		height: 100%;
 	}
 	
 	.piano-keyboard {
 		position: relative;
 		width: 100%;
-		height: 100%;
 		min-width: 100%;
+		height: 100%;
 		user-select: none;
 		margin: 0;
-		display: flex;
-		flex-direction: column;
 	}
 	
 	.white-keys {
@@ -188,13 +184,10 @@
 		height: 100%;
 		position: relative;
 		z-index: 1;
-		margin: 0;
-		padding: 0;
 	}
 	
 	.white-key {
 		width: calc(100% / 21);
-		height: 100%;
 		background: linear-gradient(to bottom, #ffffff 0%, #f8f8f8 100%);
 		border: 1px solid #ddd;
 		border-radius: 0 0 8px 8px;
@@ -204,9 +197,8 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		padding-bottom: 10px;
+		padding-bottom: 5px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		margin: 0;
 	}
 	
 	.white-key:hover {
@@ -243,8 +235,6 @@
 		width: 100%;
 		height: 65%;
 		z-index: 2;
-		margin: 0;
-		padding: 0;
 	}
 	
 	.black-key {
@@ -258,11 +248,10 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		padding-bottom: 8px;
+		padding-bottom: 4px;
 		color: white;
 		font-size: 12px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-		margin: 0;
 	}
 	
 	.black-key:hover {

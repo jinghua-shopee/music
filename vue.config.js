@@ -1,46 +1,39 @@
-const path = require('path')
-
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
-  outputDir: 'dist',
-  assetsDir: 'static',
   configureWebpack: {
+    entry: {
+      app: './main.js'
+    },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
-        'vue$': 'vue/dist/vue.esm.js'
+        '@': require('path').resolve(__dirname)
       }
     }
   },
-  chainWebpack: config => {
-    // 处理uni-app的pages
-    config.module
-      .rule('vue')
-      .use('vue-loader')
-      .loader('vue-loader')
-      .tap(options => {
-        // 确保支持uni-app的页面组件
-        return options
-      })
-  },
-  transpileDependencies: [
-    'uni-app'
-  ],
+  
+  transpileDependencies: [],
+  
   // 关闭 ESLint
   lintOnSave: false,
   
   // 生产环境配置
   productionSourceMap: false,
   
+  // 输出目录
+  outputDir: 'dist',
+  
+  // 静态资源目录
+  assetsDir: 'static',
+  
   // 开发服务器配置
   devServer: {
     port: 8080,
-    disableHostCheck: true,
-    historyApiFallback: {
-      rewrites: [
-        { from: /.*/, to: '/index.html' }
-      ]
-    }
+    open: true,
+    overlay: {
+      warnings: false,
+      errors: true
+    },
+    // 禁用 host 检查
+    disableHostCheck: true
   },
   
   // 处理 pages 模式
@@ -49,13 +42,6 @@ module.exports = {
       entry: 'main.js',
       template: 'public/index.html',
       filename: 'index.html'
-    }
-  },
-  
-  // uni-app 编译配置
-  pluginOptions: {
-    'uni-app': {
-      // 其他平台的配置
     }
   }
 } 

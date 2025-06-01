@@ -140,11 +140,14 @@
 				// 准备游戏数据
 				const gameData = {
 					mode: this.selectedMode,
-					maxQuestions: this.selectedCount === 'endless' ? 999999 : this.selectedCount
+					maxQuestions: this.selectedCount === 'endless' ? Infinity : this.selectedCount
 				}
 				
-				// 通过事件传递游戏数据给父组件
-				this.$emit('navigate', gameData)
+				// 初始化游戏状态
+				this.startGame(gameData)
+				
+				// 跳转到学习页面
+				this.$emit('navigate', 'learning')
 			},
 			
 			showToastMessage(message) {

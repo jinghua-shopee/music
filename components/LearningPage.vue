@@ -771,14 +771,8 @@
 	}
 	
 	.piano-area {
-		background: rgba(255, 255, 255, 0.9);
-		border-radius: 16px;
 		padding: 0;
-		height: 200px;
-		display: flex;
-		align-items: stretch;
-		justify-content: stretch;
-		overflow: hidden;
+		height: 160px;
 	}
 	
 	/* 学习总结弹窗 */
@@ -1233,7 +1227,7 @@
 		
 		.piano-area {
 			padding: 0;
-			height: 180px;
+			height: 160px;
 		}
 		
 		.summary-stats {

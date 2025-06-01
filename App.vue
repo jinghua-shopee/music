@@ -1,48 +1,72 @@
 <template>
 	<div id="app">
-		<!-- uni-app 页面会自动渲染在这里 -->
+		<div v-if="currentPage === 'home'" class="page">
+			<HomePage @navigate="navigateToPage" />
+		</div>
+		<div v-else-if="currentPage === 'learning'" class="page">
+			<LearningPage @navigate="navigateToPage" />
+		</div>
 	</div>
 </template>
 
 <script>
+	import HomePage from '@/components/HomePage.vue'
+	import LearningPage from '@/components/LearningPage.vue'
+	
 	export default {
 		name: 'App',
 		
-		onLaunch: function() {
-			console.log('App Launch')
+		components: {
+			HomePage,
+			LearningPage
 		},
 		
-		onShow: function() {
-			console.log('App Show')
+		data() {
+			return {
+				currentPage: 'home'
+			}
 		},
 		
-		onHide: function() {
-			console.log('App Hide')
+		mounted() {
+			console.log('App mounted!')
+			// 设置全局导航函数
+			window.navigateTo = (options) => {
+				const path = options.url || options
+				if (path.includes('learning')) {
+					this.currentPage = 'learning'
+				}
+			}
+			
+			window.navigateBack = () => {
+				this.currentPage = 'home'
+			}
+		},
+		
+		methods: {
+			navigateToPage(page) {
+				this.currentPage = page
+			}
 		}
 	}
 </script>
 
 <style>
-	/* 全局样式 */
 	* {
-		margin: 0;
-		padding: 0;
 		box-sizing: border-box;
 	}
 	
-	body {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
+	body, html {
+		margin: 0;
+		padding: 0;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 	}
 	
 	#app {
-		width: 100%;
-		height: 100%;
+		min-height: 100vh;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	}
 	
-	page {
-		width: 100%;
-		height: 100%;
+	.page {
+		min-height: 100vh;
 	}
 </style> 
