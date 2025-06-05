@@ -33,30 +33,37 @@
 /* 音符显示区域 */
 .note-display {
   display: flex;
-  gap: 24rpx;
-  margin-bottom: 10rpx;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .staff-area,
 .jianpu-area {
   flex: 1;
   text-align: center;
-  min-height: 200rpx;
+  min-height: 400rpx;
+  max-height: 450rpx;
+  width: calc(50% - 10rpx);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .area-title {
   display: block;
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #333;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
+  flex-shrink: 0;
 }
 
 /* 控制按钮 */
 .controls {
   display: flex;
-  gap: 24rpx;
-  margin-bottom: 10rpx;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
   flex-wrap: wrap;
 }
 
@@ -264,4 +271,33 @@
   display: flex;
   flex-direction: column;
   gap: 16rpx;
+}
+
+/* 响应式设计 - 更小屏幕 */
+@media (max-width: 600rpx) {
+  .note-display {
+    flex-direction: column;
+    gap: 30rpx;
+  }
+  
+  .staff-area,
+  .jianpu-area {
+    width: 100%;
+    min-height: 300rpx;
+    max-height: 350rpx;
+  }
+  
+  .area-title {
+    font-size: 28rpx;
+    margin-bottom: 16rpx;
+  }
+  
+  .controls {
+    flex-direction: column;
+    gap: 20rpx;
+  }
+  
+  .control-btn {
+    width: 100%;
+  }
 } 

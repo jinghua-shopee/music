@@ -60,9 +60,9 @@ typings/
 # next.js build output
 .next
 
-# uni-app编译输出
-/dist/
-/unpackage/
+# 微信小程序相关
+miniprogram_npm/
+miniprogram/miniprogram_npm/
 
 # IDE文件
 .vscode/
@@ -77,4 +77,5 @@ Thumbs.db
 
 # 小程序开发工具相关
 project.config.json
-project.private.config.json 
+project.private.config.json
+sitemap.json 

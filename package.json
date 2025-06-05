@@ -1,32 +1,20 @@
 {
-  "name": "music-learning-uniapp",
+  "name": "music-learning-miniprogram",
   "version": "1.0.0",
-  "description": "五线谱简谱学习器 uni-app版本",
-  "main": "main.js",
+  "description": "五线谱简谱学习器 微信小程序版本",
+  "main": "miniprogram/app.js",
   "scripts": {
-    "dev": "vue-cli-service serve",
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "build:h5": "vue-cli-service build",
-    "preview": "vue-cli-service serve --mode production",
-    "lint": "echo 'Linting disabled'",
-    "start": "npm run serve"
+    "dev": "echo '请在微信开发者工具中打开 miniprogram 目录'",
+    "build": "echo '请在微信开发者工具中进行编译上传'",
+    "preview": "echo '请在微信开发者工具中进行预览'"
   },
-  "dependencies": {
-    "vue": "^2.6.11",
-    "vuex": "^3.6.2"
-  },
-  "devDependencies": {
-    "@vue/cli-service": "^4.5.15",
-    "cross-env": "^7.0.3",
-    "vue-template-compiler": "^2.6.11"
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "keywords": [
-    "uni-app",
+    "微信小程序",
     "音乐学习",
     "五线谱",
     "简谱",
-    "Vue.js",
     "音乐教育"
   ],
   "author": "",

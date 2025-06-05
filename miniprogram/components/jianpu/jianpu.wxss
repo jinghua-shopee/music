@@ -1,12 +1,13 @@
 .jianpu-container {
   width: 100%;
-  height: 200rpx;
+  height: 320rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #ffffff;
   border-radius: 12rpx;
   position: relative;
+  overflow: hidden;
 }
 
 .jianpu-note {
