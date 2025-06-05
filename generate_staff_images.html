@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五线谱图片生成器</title>
+    <script src="./abcjs-basic-min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .progress {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #666;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .staff-preview {
+            width: 500px;
+            height: 500px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            background: white;
+            display: none;
+        }
+        .note-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .note-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .note-section h3 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .note-item:last-child {
+            border-bottom: none;
+        }
+        .note-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .note-position {
+            color: #666;
+            font-size: 14px;
+        }
+        .status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+        .status.generated {
+            background: #4CAF50;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎼 五线谱图片生成器</h1>
+            <p>根据现有代码的五线谱渲染方法，生成高低音PNG图片</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="generateAllImages()">开始生成所有图片</button>
+            <button class="btn" onclick="generateTrebleImages()">仅生成高音图片</button>
+            <button class="btn" onclick="generateBassImages()">仅生成低音图片</button>
+            <button class="btn" onclick="clearLog()">清空日志</button>
+        </div>
+
+        <div class="progress">
+            <div id="progressText">准备就绪</div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="staffPreview" class="staff-preview"></div>
+
+        <div class="note-list">
+            <div class="note-section">
+                <h3>🎵 高音符号 (下加3线 → 上加5线)</h3>
+                <div id="trebleNotesList"></div>
+            </div>
+            <div class="note-section">
+                <h3>🎵 低音符号 (下加7线 → 上加3线)</h3>
+                <div id="bassNotesList"></div>
+            </div>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        // 高音符号音符定义（从下加3线到上加5线）
+        const trebleNotes = [
+            // 下加线
+            { abc: "A,,", name: "A2", position: "下加3线" },
+            { abc: "B,,", name: "B2", position: "下加3线间" },
+            { abc: "C,", name: "C3", position: "下加2线" },
+            { abc: "D,", name: "D3", position: "下加2线间" },
+            { abc: "E,", name: "E3", position: "下加1线" },
+            { abc: "F,", name: "F3", position: "下加1线间" },
+            
+            // 五线谱标准线
+            { abc: "G,", name: "G3", position: "第1线" },
+            { abc: "A,", name: "A3", position: "第1间" },
+            { abc: "B,", name: "B3", position: "第2线" },
+            { abc: "c", name: "C4", position: "第2间" },
+            { abc: "d", name: "D4", position: "第3线" },
+            { abc: "e", name: "E4", position: "第3间" },
+            { abc: "f", name: "F4", position: "第4线" },
+            { abc: "g", name: "G4", position: "第4间" },
+            { abc: "a", name: "A4", position: "第5线" },
+            
+            // 上加线
+            { abc: "b", name: "B4", position: "上加1线间" },
+            { abc: "c'", name: "C5", position: "上加1线" },
+            { abc: "d'", name: "D5", position: "上加1线间" },
+            { abc: "e'", name: "E5", position: "上加2线" },
+            { abc: "f'", name: "F5", position: "上加2线间" },
+            { abc: "g'", name: "G5", position: "上加3线" },
+            { abc: "a'", name: "A5", position: "上加3线间" },
+            { abc: "b'", name: "B5", position: "上加4线" },
+            { abc: "c''", name: "C6", position: "上加4线间" },
+            { abc: "d''", name: "D6", position: "上加5线" }
+        ];
+
+        // 低音符号音符定义（从下加7线到上加3线）
+        const bassNotes = [
+            // 下加线（7线到1线）
+            { abc: "C,,,,", name: "C1", position: "下加7线" },
+            { abc: "D,,,,", name: "D1", position: "下加7线间" },
+            { abc: "E,,,,", name: "E1", position: "下加6线" },
+            { abc: "F,,,,", name: "F1", position: "下加6线间" },
+            { abc: "G,,,,", name: "G1", position: "下加5线" },
+            { abc: "A,,,,", name: "A1", position: "下加5线间" },
+            { abc: "B,,,,", name: "B1", position: "下加4线" },
+            { abc: "C,,,", name: "C2", position: "下加4线间" },
+            { abc: "D,,,", name: "D2", position: "下加3线" },
+            { abc: "E,,,", name: "E2", position: "下加3线间" },
+            { abc: "F,,,", name: "F2", position: "下加2线" },
+            { abc: "G,,,", name: "G2", position: "下加2线间" },
+            { abc: "A,,,", name: "A2", position: "下加1线" },
+            { abc: "B,,,", name: "B2", position: "下加1线间" },
+            
+            // 五线谱标准线
+            { abc: "C,,", name: "C3", position: "第1线" },
+            { abc: "D,,", name: "D3", position: "第1间" },
+            { abc: "E,,", name: "E3", position: "第2线" },
+            { abc: "F,,", name: "F3", position: "第2间" },
+            { abc: "G,,", name: "G3", position: "第3线" },
+            { abc: "A,,", name: "A3", position: "第3间" },
+            { abc: "B,,", name: "B3", position: "第4线" },
+            { abc: "C,", name: "C4", position: "第4间" },
+            { abc: "D,", name: "D4", position: "第5线" },
+            
+            // 上加线（1线到3线）
+            { abc: "E,", name: "E4", position: "上加1线间" },
+            { abc: "F,", name: "F4", position: "上加1线" },
+            { abc: "G,", name: "G4", position: "上加1线间" },
+            { abc: "A,", name: "A4", position: "上加2线" },
+            { abc: "B,", name: "B4", position: "上加2线间" },
+            { abc: "c", name: "C5", position: "上加3线" }
+        ];
+
+        let currentProgress = 0;
+        let totalNotes = 0;
+        let generatedCount = 0;
+
+        // 初始化页面
+        function initializePage() {
+            renderNotesList();
+            log('页面初始化完成，准备生成图片');
+        }
+
+        // 渲染音符列表
+        function renderNotesList() {
+            const trebleList = document.getElementById('trebleNotesList');
+            const bassList = document.getElementById('bassNotesList');
+            
+            trebleList.innerHTML = trebleNotes.map((note, index) => `
+                <div class="note-item">
+                    <div>
+                        <div class="note-name">${note.name}</div>
+                        <div class="note-position">${note.position}</div>
+                    </div>
+                    <div class="status" id="treble-${index}"></div>
+                </div>
+            `).join('');
+            
+            bassList.innerHTML = bassNotes.map((note, index) => `
+                <div class="note-item">
+                    <div>
+                        <div class="note-name">${note.name}</div>
+                        <div class="note-position">${note.position}</div>
+                    </div>
+                    <div class="status" id="bass-${index}"></div>
+                </div>
+            `).join('');
+        }
+
+        // 更新进度
+        function updateProgress(current, total, text) {
+            currentProgress = current;
+            totalNotes = total;
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+            
+            document.getElementById('progressText').textContent = text;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        // 日志函数
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // 清空日志
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // 渲染单个音符并下载为PNG
+        async function renderNoteToImage(note, clef, filename, statusElementId) {
+            try {
+                const abcNotation = `X:1
+L:1/4
+K:C clef=${clef}
+${note.abc}`;
+
+                // 清空预览区域
+                const preview = document.getElementById('staffPreview');
+                preview.innerHTML = '';
+                preview.style.display = 'block';
+
+                // 使用ABCJS渲染（优化参数减小SVG尺寸）
+                ABCJS.renderAbc(preview, abcNotation, {
+                    scale: 15.0,  // 减小scale从20.0到15.0
+                    staffwidth: 120,  // 减小staff宽度从150到120
+                    paddingleft: 60,   // 减小左边距从80到60
+                    paddingright: 60,  // 减小右边距从80到60
+                    paddingtop: 5,    // 保持小上边距
+                    paddingbottom: 5, // 保持小下边距
+                    add_classes: true,
+                    responsive: "resize"
+                });
+
+                // 等待渲染完成
+                await new Promise(resolve => setTimeout(resolve, 200));
+
+                // 获取SVG元素并处理居中
+                const svgElement = preview.querySelector('svg');
+                if (!svgElement) {
+                    throw new Error('无法生成SVG元素');
+                }
+
+                // 设置最终输出尺寸为800x800（减少空白）
+                const outputSize = 700;
+                
+                // 创建Canvas进行PNG转换
+                const canvas = document.createElement('canvas');
+                canvas.width = outputSize;
+                canvas.height = outputSize;
+                const ctx = canvas.getContext('2d');
+
+                // 设置白色背景
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, outputSize, outputSize);
+
+                // 直接获取SVG的原始尺寸
+                const svgWidth = parseFloat(svgElement.getAttribute('width')) || svgElement.getBoundingClientRect().width;
+                const svgHeight = parseFloat(svgElement.getAttribute('height')) || svgElement.getBoundingClientRect().height;
+                
+                // 调试信息：输出SVG尺寸
+                console.log(`SVG原始尺寸: ${svgWidth}x${svgHeight}`);
+                log(`🔍 调试: SVG尺寸=${svgWidth}x${svgHeight}`);
+                
+                // 将SVG转换为图片
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        // 保存当前状态
+                        ctx.save();
+                        
+                        // 移动到画布中心
+                        ctx.translate(outputSize / 2, outputSize / 2);
+                        
+                        // 使用固定的五线谱目标尺寸，不随PNG尺寸变化
+                        const fixedStaffSize = 1100; // 增加到1100px，缩放比例提升到0.92
+                        const scale = Math.min(fixedStaffSize / svgWidth, fixedStaffSize / svgHeight);
+                        console.log(`计算缩放比例: ${scale} (目标=${fixedStaffSize})`);
+                        ctx.scale(scale, scale);
+                        
+                        // 从中心点绘制图片（所以要向左上偏移一半）
+                        ctx.drawImage(img, -svgWidth / 2, -svgHeight / 2, svgWidth, svgHeight);
+                        
+                        // 恢复状态
+                        ctx.restore();
+                        
+                        // 转换为PNG并下载
+                        canvas.toBlob(function(blob) {
+                            const link = document.createElement('a');
+                            link.download = filename;
+                            link.href = URL.createObjectURL(blob);
+                            link.click();
+                            
+                            // 清理URL
+                            URL.revokeObjectURL(url);
+                            URL.revokeObjectURL(link.href);
+                            
+                            // 更新状态
+                            if (statusElementId) {
+                                document.getElementById(statusElementId).classList.add('generated');
+                            }
+                            
+                            generatedCount++;
+                            log(`✅ 已生成: ${filename}`);
+                            resolve();
+                        }, 'image/png', 0.95); // PNG-8压缩
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('图片加载失败'));
+                    };
+                    
+                    img.src = url;
+                });
+
+            } catch (error) {
+                log(`❌ 生成 ${filename} 失败: ${error.message}`);
+                throw error;
+            }
+        }
+
+        // 生成所有高音图片
+        async function generateTrebleImages() {
+            log('开始生成高音符号图片...');
+            updateProgress(0, trebleNotes.length, '生成高音符号图片中...');
+            
+            for (let i = 0; i < trebleNotes.length; i++) {
+                const note = trebleNotes[i];
+                const filename = `treble_${note.name}_${note.position}.png`;
+                
+                try {
+                    await renderNoteToImage(note, 'treble', filename, `treble-${i}`);
+                    updateProgress(i + 1, trebleNotes.length, `高音符号进度: ${i + 1}/${trebleNotes.length}`);
+                    
+                    // 添加延迟避免浏览器卡顿
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                } catch (error) {
+                    log(`❌ 跳过 ${filename}: ${error.message}`);
+                }
+            }
+            
+            log(`✅ 高音符号图片生成完成！共${trebleNotes.length}张`);
+        }
+
+        // 生成所有低音图片
+        async function generateBassImages() {
+            log('开始生成低音符号图片...');
+            updateProgress(0, bassNotes.length, '生成低音符号图片中...');
+            
+            for (let i = 0; i < bassNotes.length; i++) {
+                const note = bassNotes[i];
+                const filename = `bass_${note.name}_${note.position}.png`;
+                
+                try {
+                    await renderNoteToImage(note, 'bass', filename, `bass-${i}`);
+                    updateProgress(i + 1, bassNotes.length, `低音符号进度: ${i + 1}/${bassNotes.length}`);
+                    
+                    // 添加延迟避免浏览器卡顿
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                } catch (error) {
+                    log(`❌ 跳过 ${filename}: ${error.message}`);
+                }
+            }
+            
+            log(`✅ 低音符号图片生成完成！共${bassNotes.length}张`);
+        }
+
+        // 生成所有图片
+        async function generateAllImages() {
+            const startTime = Date.now();
+            generatedCount = 0;
+            
+            log('🚀 开始生成所有五线谱图片...');
+            log(`📊 计划生成 ${trebleNotes.length + bassNotes.length} 张图片`);
+            log('📏 图片规格: 500x500像素, 完美水平居中, 优化ABCJS参数+调试信息');
+            
+            // 禁用按钮
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            try {
+                // 先生成高音
+                await generateTrebleImages();
+                
+                // 再生成低音
+                await generateBassImages();
+                
+                const endTime = Date.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(1);
+                
+                updateProgress(trebleNotes.length + bassNotes.length, trebleNotes.length + bassNotes.length, '生成完成！');
+                log(`🎉 所有图片生成完成！`);
+                log(`📊 总计: ${generatedCount}张图片`);
+                log(`⏱️ 耗时: ${duration}秒`);
+                log(`💾 图片已自动下载到您的下载文件夹`);
+                
+                // 隐藏预览
+                document.getElementById('staffPreview').style.display = 'none';
+                
+            } catch (error) {
+                log(`❌ 生成过程中出现错误: ${error.message}`);
+            } finally {
+                // 重新启用按钮
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>
