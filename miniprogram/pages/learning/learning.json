@@ -1,7 +1,6 @@
 {
   "usingComponents": {
     "piano": "/components/piano/piano",
-    "staff": "/components/staff/staff",
     "vex-staff": "/components/vex-staff/vex-staff",
     "jianpu": "/components/jianpu/jianpu"
   }
