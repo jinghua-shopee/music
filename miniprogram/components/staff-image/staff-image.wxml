@@ -1,0 +1,26 @@
+<view class="staff-image-container">
+  <!-- 五线谱图片 -->
+  <view wx:if="{{!showPlaceholder && staffImageSrc}}" class="staff-image-wrapper">
+    <image 
+      class="staff-image"
+      src="{{staffImageSrc}}"
+      mode="aspectFit"
+      bindload="onImageLoad"
+      binderror="onImageError"
+      lazy-load="{{false}}"
+      show-menu-by-longpress="{{false}}"
+    />
+  </view>
+  
+  <!-- 占位符 -->
+  <view wx:if="{{showPlaceholder}}" class="staff-placeholder">
+    <view class="placeholder-icon">🎼</view>
+    <text class="placeholder-text">
+      {{staffImageSrc ? '图片加载中...' : '等待音符...'}}
+    </text>
+    <!-- 调试信息 -->
+    <view wx:if="{{staffImageSrc}}" class="debug-info">
+      <text>图片路径: {{staffImageSrc}}</text>
+    </view>
+  </view>
+</view> 

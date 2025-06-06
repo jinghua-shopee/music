@@ -1,0 +1,84 @@
+.container {
+  padding: 40rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.direct-image-test {
+  background: white;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.test-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.test-image {
+  width: 100%;
+  height: 200rpx;
+  border: 1px solid #ddd;
+  border-radius: 8rpx;
+  margin-bottom: 10rpx;
+}
+
+.test-path {
+  font-size: 24rpx;
+  color: #666;
+  word-break: break-all;
+}
+
+.note-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40rpx;
+  padding: 20rpx;
+  background: white;
+  border-radius: 12rpx;
+}
+
+.note-name {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.note-index {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.staff-container {
+  margin-bottom: 40rpx;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 40rpx;
+}
+
+.btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+} 

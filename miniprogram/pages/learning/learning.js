@@ -43,26 +43,50 @@ Page({
   },
 
   onShow() {
+    console.log('学习页面显示')
+    
+    // 确保有音符数据
+    if (!app.globalData.currentNote) {
+      console.log('onShow时没有音符，重新生成')
+      app.generateNewNote()
+    }
+    
     this.updateData()
   },
 
   // 初始化页面数据
   initPageData() {
     const globalData = app.globalData
+    
+    console.log('初始化页面数据，当前音符:', globalData.currentNote)
+    
+    // 如果没有当前音符，说明没有通过正常流程启动游戏，自动启动练习模式
+    if (!globalData.currentNote) {
+      console.log('没有音符，自动启动练习模式')
+      app.startGame({
+        mode: 'practice',
+        maxQuestions: Infinity // 无尽模式
+      })
+    }
+    
     this.setData({
-      gameMode: globalData.gameMode,
+      gameMode: globalData.gameMode || 'practice',
       currentPlayer: globalData.currentPlayer,
       currentNote: globalData.currentNote,
       selectedKey: globalData.selectedKey,
       hasShownJianpu: globalData.hasShownJianpu
     })
     
+    console.log('设置的音符数据:', globalData.currentNote)
     this.updateDisplayData()
   },
 
   // 更新数据
   updateData() {
     const globalData = app.globalData
+    
+    console.log('更新数据，当前音符:', globalData.currentNote)
+    
     this.setData({
       currentNote: globalData.currentNote,
       selectedKey: globalData.selectedKey,
@@ -72,6 +96,7 @@ Page({
       wrongAnswers: globalData.wrongAnswers
     })
     
+    console.log('更新后的页面音符数据:', this.data.currentNote)
     this.updateDisplayData()
   },
 
