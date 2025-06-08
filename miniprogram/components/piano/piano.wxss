@@ -10,7 +10,7 @@
 .piano-keyboard {
   position: relative;
   height: 200rpx;
-  width: 2000rpx; /* 扩展宽度以容纳A0-D6的所有键（增加了A0, A#0, B0） */
+  width: 2250rpx; /* 调整宽度以容纳A0(x:0)到B6(x:2150)的所有键，预留一些余量 */
   margin: 0 auto;
   background: #f8f9fa;
   border-radius: 8rpx;
