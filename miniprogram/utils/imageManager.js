@@ -390,18 +390,18 @@ class ImageManager {
   async downloadSingleImage(config) {
     return new Promise((resolve, reject) => {
       // 打印下载配置信息
-      console.log('音符:', config.noteName, '谱号:', config.clef, '位置:', config.position)
-      console.log('原始文件名:', config.fileName)
-      console.log('本地文件名:', config.localFileName)
-      console.log('下载URL:', config.remoteUrl)
-      console.log('本地路径:', config.localPath)
+      // console.log('音符:', config.noteName, '谱号:', config.clef, '位置:', config.position)
+      // console.log('原始文件名:', config.fileName)
+      // console.log('本地文件名:', config.localFileName)
+      // console.log('下载URL:', config.remoteUrl)
+      // console.log('本地路径:', config.localPath)
       
       // 先检查本地是否已存在
       wx.getFileSystemManager().access({
         path: config.localPath,
         success: () => {
           // 文件已存在，直接返回
-          console.log(`✅ 图片已存在: ${config.localFileName}`)
+        //  console.log(`✅ 图片已存在: ${config.localFileName}`)
           this.downloadStatus[config.key] = 'success'
           resolve(config.localPath)
         },

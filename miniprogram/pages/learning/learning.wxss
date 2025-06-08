@@ -74,6 +74,31 @@
   min-width: 120rpx;
 }
 
+/* 学习页面专用按钮样式 - 覆盖全局样式 */
+.controls .btn-primary {
+  background: linear-gradient(135deg, #11c582 0%, #00d4aa 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(17, 197, 130, 0.4);
+  font-weight: 600;
+}
+
+.controls .btn-primary:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(17, 197, 130, 0.4);
+}
+
+.controls .btn-danger {
+  background: linear-gradient(135deg, #ff7b7b 0%, #ff5722 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(255, 123, 123, 0.4);
+  font-weight: 600;
+}
+
+.controls .btn-danger:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(255, 123, 123, 0.4);
+}
+
 /* 钢琴区域 */
 .piano-area {
   margin-bottom: 0rpx;
@@ -213,6 +238,31 @@
   flex: 1;
 }
 
+/* 弹窗按钮样式优化 */
+.summary-actions .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+  font-weight: 600;
+}
+
+.summary-actions .btn-primary:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.4);
+}
+
+.summary-actions .btn-danger {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(240, 147, 251, 0.4);
+  font-weight: 600;
+}
+
+.summary-actions .btn-danger:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(240, 147, 251, 0.4);
+}
+
 /* 退出确认弹窗 */
 .exit-header {
   text-align: center;
@@ -234,30 +284,53 @@
 .exit-progress {
   text-align: center;
   margin-bottom: 32rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20rpx 0;
 }
 
 .progress-circle {
-  display: inline-block;
-  width: 120rpx;
-  height: 120rpx;
-  border: 4rpx solid #667eea;
+  width: 140rpx;
+  height: 140rpx;
+  border: 6rpx solid #667eea;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(102, 126, 234, 0.05));
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12rpx 32rpx rgba(102, 126, 234, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
+  }
 }
 
 .progress-number {
-  font-size: 32rpx;
-  font-weight: 600;
+  font-size: 40rpx;
+  font-weight: 700;
   color: #667eea;
+  text-shadow: 0 2rpx 4rpx rgba(102, 126, 234, 0.1);
 }
 
 .progress-label {
-  font-size: 20rpx;
-  color: #999;
+  font-size: 22rpx;
+  color: #667eea;
   margin-top: 4rpx;
+  font-weight: 500;
 }
 
 .exit-message {
@@ -265,12 +338,50 @@
   margin-bottom: 32rpx;
   line-height: 1.6;
   color: #666;
+  font-size: 28rpx;
+  padding: 0 20rpx;
 }
 
 .exit-actions {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
+}
+
+/* 退出弹窗按钮样式 */
+.exit-actions .btn-primary {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(78, 205, 196, 0.4);
+  font-weight: 600;
+}
+
+.exit-actions .btn-primary:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(78, 205, 196, 0.4);
+}
+
+.exit-actions .btn-outline {
+  background: transparent;
+  color: #667eea;
+  border: 2rpx solid #667eea;
+  font-weight: 600;
+}
+
+.exit-actions .btn-outline:active {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.exit-actions .btn-danger {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #8B4513;
+  box-shadow: 0 8rpx 24rpx rgba(255, 236, 210, 0.4);
+  font-weight: 600;
+}
+
+.exit-actions .btn-danger:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(255, 236, 210, 0.4);
 }
 
 /* 响应式设计 - 更小屏幕 */
