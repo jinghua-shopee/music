@@ -6,7 +6,7 @@
 
 ## 🌐 云端图片地址
 
-**基础URL**: `https://music-1253799806.cos.ap-guangzhou.myqcloud.com/pic/`
+**基础URL**: `https://music-1253799806.cos.ap-guangzhou.myqcloud.com/pic_v2/`
 
 **图片命名规则**: `{clef}_{noteName}_{position}.png`
 - `clef`: 谱号类型 (`treble` 或 `bass`)

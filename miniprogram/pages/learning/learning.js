@@ -5,7 +5,7 @@ const { audioManager } = require('../../utils/audioUtils.js')
 Page({
   data: {
     // 页面状态
-    pageTitle: '五线谱简谱学习',
+    pageTitle: '',
     gameModeText: '',
     progressText: '',
     endButtonText: '结束学习',

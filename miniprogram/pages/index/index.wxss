@@ -92,6 +92,7 @@
 
 /* 模式选择 */
 .mode-selection {
+  margin-top: 60rpx;
   margin-bottom: 80rpx;
 }
 

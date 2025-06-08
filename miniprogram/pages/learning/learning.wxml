@@ -1,6 +1,6 @@
 <view class="container">
   <view class="learning-content">
-    <text class="title">🎹 {{pageTitle}}</text>
+    <text class="title"> {{pageTitle}}</text>
     
     <!-- 游戏信息 -->
     <view class="game-info card">

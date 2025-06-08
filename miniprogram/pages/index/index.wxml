@@ -1,6 +1,6 @@
 <view class="container">
   <view class="home-content">
-    <text class="title">🎵 五线谱简谱对照学习</text>
+    <text class="title">🎵 五线谱简谱对照</text>
     
     <!-- 图片下载状态区域 -->
     <view class="download-status" wx:if="{{imageDownloadStatus.isDownloading || imageDownloadStatus.error}}">
