@@ -79,6 +79,51 @@
   margin-bottom: 0rpx;
 }
 
+/* 调试信息区域 */
+.debug-info {
+  margin-bottom: 40rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-left: 8rpx solid #007bff;
+}
+
+.debug-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #007bff;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.debug-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+  padding: 8rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.debug-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.debug-label {
+  font-size: 24rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.debug-value {
+  font-size: 24rpx;
+  color: #333;
+  font-weight: 600;
+  background: #f8f9fa;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+}
+
 /* 总结弹窗 */
 .summary-header {
   text-align: center;

@@ -12,21 +12,60 @@
 
 .jianpu-note {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 120rpx;
-  height: 120rpx;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  border-radius: 50%;
-  box-shadow: 0 8rpx 24rpx rgba(79, 172, 254, 0.4);
+  min-height: 200rpx;
+  padding: 20rpx;
   animation: fadeIn 0.5s ease-in-out;
 }
 
+.high-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 40rpx;
+  justify-content: flex-end;
+  margin-bottom: 8rpx;
+}
+
+.number-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .jianpu-number {
-  font-size: 64rpx;
+  font-size: 120rpx;
   font-weight: 700;
-  color: #ffffff;
-  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+  color: #4facfe;
+  text-shadow: 0 2rpx 8rpx rgba(79, 172, 254, 0.3);
+  line-height: 1;
+}
+
+.low-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 40rpx;
+  justify-content: flex-start;
+  margin-top: 8rpx;
+}
+
+.dot {
+  font-size: 32rpx;
+  color: #4facfe;
+  font-weight: 700;
+  line-height: 1;
+  margin: 2rpx 0;
+}
+
+.high-dot {
+  /* 高音点样式 */
+}
+
+.low-dot {
+  /* 低音点样式 */
 }
 
 .jianpu-hidden {

@@ -21,13 +21,38 @@
     <!-- 五线谱和简谱显示区域 -->
     <view class="note-display">
       <view class="staff-area card">
-        <text class="area-title">五线谱 (图片渲染)</text>
-        <staff-image note="{{currentNote}}" clef="treble" />
+        <text class="area-title">五线谱 ({{currentNote ? (currentNote.clef === 'treble' ? '高音符号' : '低音符号') : '图片渲染'}})</text>
+        <staff-image note="{{currentNote}}" clef="{{currentNote ? currentNote.clef : 'treble'}}" />
       </view>
       
       <view class="jianpu-area card">
         <text class="area-title">简谱</text>
         <jianpu note="{{currentNote}}" show="{{hasShownJianpu}}" />
+      </view>
+    </view>
+    
+    <!-- 调试信息区域 -->
+    <view wx:if="{{currentNote}}" class="debug-info card">
+      <text class="debug-title">🔍 音符调试信息</text>
+      <view class="debug-item">
+        <text class="debug-label">音符名称:</text>
+        <text class="debug-value">{{currentNote.name}}</text>
+      </view>
+      <view class="debug-item">
+        <text class="debug-label">谱号:</text>
+        <text class="debug-value">{{currentNote.clef === 'treble' ? '高音符号' : '低音符号'}}</text>
+      </view>
+      <view class="debug-item">
+        <text class="debug-label">五线谱位置:</text>
+        <text class="debug-value">{{currentNote.position}}</text>
+      </view>
+      <view class="debug-item">
+        <text class="debug-label">钢琴键:</text>
+        <text class="debug-value">{{currentNote.pianoKey}}</text>
+      </view>
+      <view class="debug-item">
+        <text class="debug-label">简谱:</text>
+        <text class="debug-value">{{currentNote.jianpu}}</text>
       </view>
     </view>
     

@@ -11,6 +11,10 @@
     "navigationBarTextStyle": "white",
     "backgroundColor": "#667eea"
   },
+  "networkTimeout": {
+    "request": 60000,
+    "downloadFile": 60000
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

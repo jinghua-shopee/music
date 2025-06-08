@@ -1,6 +1,19 @@
 <view class="jianpu-container">
   <view wx:if="{{note && show}}" class="jianpu-note">
-    <text class="jianpu-number">{{note.jianpu}}</text>
+    <!-- 高音点区域 -->
+    <view class="high-dots">
+      <text wx:for="{{parsedJianpu.highDots}}" wx:key="index" class="dot high-dot">•</text>
+    </view>
+    
+    <!-- 数字 -->
+    <view class="number-container">
+      <text class="jianpu-number">{{parsedJianpu.number}}</text>
+    </view>
+    
+    <!-- 低音点区域 -->
+    <view class="low-dots">
+      <text wx:for="{{parsedJianpu.lowDots}}" wx:key="index" class="dot low-dot">•</text>
+    </view>
   </view>
   
   <view wx:elif="{{note && !show}}" class="jianpu-hidden">

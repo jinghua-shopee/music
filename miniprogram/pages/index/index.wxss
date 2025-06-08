@@ -5,6 +5,113 @@
   text-align: center;
 }
 
+/* 图片下载状态 */
+.download-status {
+  margin: 40rpx 0;
+  padding: 32rpx;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 24rpx;
+  backdrop-filter: blur(10px);
+}
+
+.downloading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.download-icon {
+  font-size: 48rpx;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10rpx);
+  }
+  60% {
+    transform: translateY(-5rpx);
+  }
+}
+
+.download-text {
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4rpx;
+  overflow: hidden;
+  margin: 8rpx 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 24rpx;
+}
+
+.download-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.error-icon {
+  font-size: 48rpx;
+  color: #f44336;
+}
+
+.error-text {
+  color: #f44336;
+  font-size: 28rpx;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.retry-btn {
+  margin-top: 16rpx;
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+}
+
+.download-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin: 40rpx 0;
+  padding: 24rpx;
+  background: rgba(76, 175, 80, 0.2);
+  border-radius: 16rpx;
+  backdrop-filter: blur(10px);
+}
+
+.success-icon {
+  font-size: 40rpx;
+}
+
+.success-text {
+  color: #4CAF50;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
 /* 模式选择 */
 .mode-selection {
   margin-bottom: 80rpx;
@@ -31,6 +138,11 @@
   border-color: rgba(255, 255, 255, 0.6);
   transform: translateY(-4rpx);
   box-shadow: 0 16rpx 32rpx rgba(0, 0, 0, 0.2);
+}
+
+.mode-card.disabled {
+  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .mode-icon {
@@ -108,4 +220,14 @@
   background: rgba(255, 255, 255, 0.2) !important;
   color: rgba(255, 255, 255, 0.5) !important;
   box-shadow: none !important;
+}
+
+/* 测试按钮 */
+.test-btn {
+  width: 100%;
+  padding: 24rpx;
+  font-size: 28rpx;
+  margin-top: 20rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
 } 

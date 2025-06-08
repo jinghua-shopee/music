@@ -2,13 +2,37 @@
   <view class="home-content">
     <text class="title">🎵 五线谱简谱对照学习</text>
     
+    <!-- 图片下载状态区域 -->
+    <view class="download-status" wx:if="{{imageDownloadStatus.isDownloading || imageDownloadStatus.error}}">
+      <view wx:if="{{imageDownloadStatus.isDownloading}}" class="downloading">
+        <view class="download-icon">⬇️</view>
+        <text class="download-text">正在加载五线谱图片...</text>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{imageDownloadStatus.progress}}%"></view>
+        </view>
+        <text class="progress-text">{{imageDownloadStatus.progress}}%</text>
+      </view>
+      
+      <view wx:if="{{imageDownloadStatus.error}}" class="download-error">
+        <view class="error-icon">⚠️</view>
+        <text class="error-text">图片加载失败：{{imageDownloadStatus.error}}</text>
+        <button class="btn btn-secondary retry-btn" bindtap="retryDownload">重新下载</button>
+      </view>
+    </view>
+
+    <!-- 下载完成提示 -->
+    <view class="download-success" wx:if="{{imageDownloadStatus.isCompleted && !imageDownloadStatus.error}}">
+      <view class="success-icon">✅</view>
+      <text class="success-text">五线谱图片加载完成</text>
+    </view>
+    
     <!-- 模式选择区域 -->
     <view class="mode-selection">
       <text class="section-title">选择学习模式</text>
       <view class="mode-cards">
         <view 
-          class="mode-card {{selectedMode === 'practice' ? 'active' : ''}}" 
-          bindtap="selectMode"
+          class="mode-card {{selectedMode === 'practice' ? 'active' : ''}} {{!imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
+          bindtap="{{imageDownloadStatus.isCompleted ? 'selectMode' : ''}}"
           data-mode="practice"
         >
           <view class="mode-icon">📚</view>
@@ -16,8 +40,8 @@
           <view class="mode-desc">自主练习，提升技能</view>
         </view>
         <view 
-          class="mode-card {{selectedMode === 'pk' ? 'active' : ''}}" 
-          bindtap="selectMode"
+          class="mode-card {{selectedMode === 'pk' ? 'active' : ''}} {{!imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
+          bindtap="{{imageDownloadStatus.isCompleted ? 'selectMode' : ''}}"
           data-mode="pk"
         >
           <view class="mode-icon">⚔️</view>
@@ -32,24 +56,24 @@
       <text class="section-title">选择题目数量</text>
       <view class="question-options">
         <view 
-          class="question-option {{selectedCount === 15 ? 'active' : ''}}" 
-          bindtap="selectCount"
+          class="question-option {{selectedCount === 15 ? 'active' : ''}} {{!imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
+          bindtap="{{imageDownloadStatus.isCompleted ? 'selectCount' : ''}}"
           data-count="15"
         >
           <view class="option-number">15</view>
           <view class="option-label">道题</view>
         </view>
         <view 
-          class="question-option {{selectedCount === 30 ? 'active' : ''}}" 
-          bindtap="selectCount"
+          class="question-option {{selectedCount === 30 ? 'active' : ''}} {{!imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
+          bindtap="{{imageDownloadStatus.isCompleted ? 'selectCount' : ''}}"
           data-count="30"
         >
           <view class="option-number">30</view>
           <view class="option-label">道题</view>
         </view>
         <view 
-          class="question-option {{selectedCount === 'endless' ? 'active' : ''}} {{selectedMode === 'pk' ? 'disabled' : ''}}" 
-          bindtap="selectCount"
+          class="question-option {{selectedCount === 'endless' ? 'active' : ''}} {{selectedMode === 'pk' || !imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
+          bindtap="{{imageDownloadStatus.isCompleted && selectedMode !== 'pk' ? 'selectCount' : ''}}"
           data-count="endless"
         >
           <view class="option-number">∞</view>
@@ -59,11 +83,19 @@
     </view>
 
     <button 
-      class="btn btn-primary start-btn {{!canStart ? 'btn-disabled' : ''}}" 
+      class="btn btn-primary start-btn {{!canStart || !imageDownloadStatus.isCompleted ? 'btn-disabled' : ''}}" 
       bindtap="startLearning"
-      disabled="{{!canStart}}"
+      disabled="{{!canStart || !imageDownloadStatus.isCompleted}}"
     >
-      开始学习
+      {{imageDownloadStatus.isCompleted ? '开始学习' : '请等待图片加载完成'}}
+    </button>
+
+    <!-- 测试按钮 -->
+    <button 
+      class="btn btn-secondary test-btn" 
+      bindtap="enterTest"
+    >
+      进入测试页面
     </button>
   </view>
   
