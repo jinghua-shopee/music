@@ -40,9 +40,6 @@ Page({
   onLoad() {
     console.log('学习页面加载')
     this.initPageData()
-    
-    // 添加调试信息
-    this.debugCurrentNote()
   },
 
   onShow() {
@@ -55,7 +52,6 @@ Page({
     }
     
     this.updateData()
-    this.debugCurrentNote()
   },
 
   // 初始化页面数据
@@ -319,22 +315,5 @@ Page({
       showExitConfirm: false
     })
     wx.navigateBack()
-  },
-
-  /**
-   * 调试当前音符信息
-   */
-  debugCurrentNote() {
-    const note = app.globalData.currentNote
-    if (note) {
-      console.log('=== 学习页面音符调试 ===')
-      console.log('音符名称:', note.name)
-      console.log('谱号:', note.clef)
-      console.log('位置:', note.position)
-      console.log('钢琴键:', note.pianoKey)
-      console.log('简谱:', note.jianpu)
-      console.log('完整音符对象:', note)
-      console.log('========================')
-    }
   }
 }) 

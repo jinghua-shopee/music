@@ -1,17 +1,12 @@
 <view class="vex-staff-container">
   <canvas 
     canvas-id="vex-staff-canvas"
-    id="vex-staff-canvas"
+    class="vex-staff-canvas"
     style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
     bindtouchstart="onCanvasTouch"
-  />
+  ></canvas>
   
   <view wx:if="{{!note}}" class="placeholder">
     <text>等待音符...</text>
-  </view>
-  
-  <view wx:if="{{showDebugInfo}}" class="debug-info">
-    <text>音符: {{note ? note.name : '无'}}</text>
-    <text>位置: {{note ? note.staffPosition : '无'}}</text>
   </view>
 </view> 

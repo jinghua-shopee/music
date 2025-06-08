@@ -29,16 +29,7 @@
   transform: translate(-50%, -50%);
 }
 
-.debug-info {
-  margin-top: 20rpx;
-  padding: 10rpx;
-  background: #f5f5f5;
-  border-radius: 8rpx;
-  font-size: 24rpx;
-  color: #666;
-}
-
-.debug-info text {
-  display: block;
-  margin-bottom: 5rpx;
+.placeholder text {
+  color: #999;
+  font-size: 28rpx;
 } 

@@ -18,9 +18,5 @@
     <text class="placeholder-text">
       {{staffImageSrc ? '图片加载中...' : '等待音符...'}}
     </text>
-    <!-- 调试信息 -->
-    <view wx:if="{{staffImageSrc}}" class="debug-info">
-      <text>图片路径: {{staffImageSrc}}</text>
-    </view>
   </view>
 </view> 

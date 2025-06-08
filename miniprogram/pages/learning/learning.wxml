@@ -31,31 +31,6 @@
       </view>
     </view>
     
-    <!-- 调试信息区域 -->
-    <view wx:if="{{currentNote}}" class="debug-info card">
-      <text class="debug-title">🔍 音符调试信息</text>
-      <view class="debug-item">
-        <text class="debug-label">音符名称:</text>
-        <text class="debug-value">{{currentNote.name}}</text>
-      </view>
-      <view class="debug-item">
-        <text class="debug-label">谱号:</text>
-        <text class="debug-value">{{currentNote.clef === 'treble' ? '高音符号' : '低音符号'}}</text>
-      </view>
-      <view class="debug-item">
-        <text class="debug-label">五线谱位置:</text>
-        <text class="debug-value">{{currentNote.position}}</text>
-      </view>
-      <view class="debug-item">
-        <text class="debug-label">钢琴键:</text>
-        <text class="debug-value">{{currentNote.pianoKey}}</text>
-      </view>
-      <view class="debug-item">
-        <text class="debug-label">简谱:</text>
-        <text class="debug-value">{{currentNote.jianpu}}</text>
-      </view>
-    </view>
-    
     <!-- 控制按钮 -->
     <view class="controls">
       <button 

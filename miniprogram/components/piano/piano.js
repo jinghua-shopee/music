@@ -18,6 +18,11 @@ Component({
 
   data: {
     keys: [
+      // 第0八度（最低音）- 只有A0, A#0, B0
+      { note: 'A0', key: 'a0', type: 'white', x: -700 },
+      { note: 'A#0', key: 'a#0', type: 'black', x: -665 },
+      { note: 'B0', key: 'b0', type: 'white', x: -650 },
+      
       // 第1八度（极低音）
       { note: 'C1', key: 'c1', type: 'white', x: -600 },
       { note: 'C#1', key: 'c#1', type: 'black', x: -565 },

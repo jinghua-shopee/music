@@ -208,14 +208,5 @@ Page({
         showToast: false
       })
     }, 2000)
-  },
-
-  /**
-   * 进入测试页面
-   */
-  enterTest() {
-    wx.navigateTo({
-      url: '/pages/test-staff/test-staff'
-    })
   }
 }) 

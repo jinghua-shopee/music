@@ -188,7 +188,7 @@ App({
       { name: 'F4', clef: 'treble', position: '第4线', pianoKey: 'f4', staffPosition: '第4线', jianpu: '4' },
       { name: 'G4', clef: 'treble', position: '第4间', pianoKey: 'g4', staffPosition: '第4间', jianpu: '5' },
       { name: 'A4', clef: 'treble', position: '第5线', pianoKey: 'a4', staffPosition: '第5线', jianpu: '6' },
-      { name: 'B4', clef: 'treble', position: '上加1线间', pianoKey: 'b4', staffPosition: '上加1线间', jianpu: '7' },
+      { name: 'B4', clef: 'treble', position: '上加1间', pianoKey: 'b4', staffPosition: '上加1间', jianpu: '7' },
       { name: 'C5', clef: 'treble', position: '上加1线', pianoKey: 'c5', staffPosition: '上加1线', jianpu: '1̇' }
     ]
     

@@ -151,40 +151,6 @@ class PianoKeyMapping {
     
     return copyCommands
   }
-
-  // 打印调试信息
-  printDebugInfo() {
-    console.log('=== 88键钢琴映射信息 ===')
-    console.log('总键数:', Object.keys(this.keyMapping).length)
-    console.log('最低音:', this.keyMapping[0])
-    console.log('中央C (C4):', this.getFileByNoteKey('c4'))
-    console.log('最高音:', this.keyMapping[87])
-    
-    console.log('\n=== 预加载建议 ===')
-    const suggestions = this.getPreloadSuggestions()
-    console.log('核心音符 (8个):', suggestions.essential.length, '个')
-    console.log('常用音符 (36个):', Object.keys(suggestions.common).length, '个')
-    console.log('扩展音符 (73个):', Object.keys(suggestions.extended).length, '个')
-    console.log('完整音符 (88个):', Object.keys(suggestions.full).length, '个')
-  }
-
-  // 验证音频文件完整性
-  validateAudioFiles() {
-    const fullRange = this.getFullRange()
-    const results = {
-      total: Object.keys(fullRange).length,
-      exists: 0,
-      missing: []
-    }
-    
-    Object.entries(fullRange).forEach(([noteKey, fileInfo]) => {
-      // 这里只是模拟检查，实际在小程序中需要其他方式验证
-      console.log(`检查音符: ${noteKey} -> ${fileInfo.file}`)
-      results.exists++
-    })
-    
-    return results
-  }
 }
 
 // 创建映射实例

@@ -5,10 +5,6 @@ Component({
     note: {
       type: Object,
       value: null
-    },
-    showDebugInfo: {
-      type: Boolean,
-      value: false
     }
   },
 
