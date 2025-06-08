@@ -1,5 +1,5 @@
 <template>
-	<div class="staff-container">
+	<div class="staff-container" :key="renderKey">
 		<div v-if="note" class="staff-display" ref="staffElement">
 			<!-- ABC.js 渲染的五线谱会插入到这里 -->
 		</div>
@@ -22,7 +22,8 @@
 		
 		data() {
 			return {
-				abcjsLoaded: false
+				abcjsLoaded: false,
+				renderKey: 0
 			}
 		},
 		
@@ -79,12 +80,15 @@
 				// 清空之前的内容
 				this.$refs.staffElement.innerHTML = ''
 				
+				// 强制重新渲染
+				this.renderKey++
+				
 				try {
 					// 如果有ABC.js库，使用它渲染
 					if (window.ABCJS && this.abcjsLoaded) {
 						window.ABCJS.renderAbc(this.$refs.staffElement, abcNotation, {
 							scale: 2.0,
-							staffwidth: 150,
+							staffwidth: 30,
 							wrap: {
 								minSpacing: 2.0,
 								maxSpacing: 3.0,
@@ -161,6 +165,8 @@
 	.staff-display svg {
 		margin: 0 auto;
 		display: block;
+		max-width: 300px !important;
+		width: 300px !important;
 	}
 	
 	.empty-staff {
@@ -196,7 +202,7 @@
 		position: absolute;
 		top: 30px;
 		left: 50px;
-		width: 180px;
+		width: 80px;
 		height: 80px;
 	}
 	
@@ -210,7 +216,7 @@
 	
 	.note {
 		position: absolute;
-		left: 140px;
+		left: 90px;
 		font-size: 32px;
 		font-weight: bold;
 		color: #333;

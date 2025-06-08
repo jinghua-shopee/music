@@ -317,11 +317,11 @@ ${note.abc}`;
                 // 使用ABCJS渲染（优化参数减小SVG尺寸）
                 ABCJS.renderAbc(preview, abcNotation, {
                     scale: 15.0,  // 减小scale从20.0到15.0
-                    staffwidth: 120,  // 减小staff宽度从150到120
-                    paddingleft: 60,   // 减小左边距从80到60
-                    paddingright: 60,  // 减小右边距从80到60
-                    paddingtop: 5,    // 保持小上边距
-                    paddingbottom: 5, // 保持小下边距
+                    staffwidth: 60,  // 大幅减小staff宽度从120到60
+                    paddingleft: 30,   // 减小左边距从60到30
+                    paddingright: 30,  // 减小右边距从60到30
+                    paddingtop: 30,    // 增加上边距确保音符完整显示
+                    paddingbottom: 30, // 增加下边距确保音符完整显示
                     add_classes: true,
                     responsive: "resize"
                 });
@@ -335,18 +335,19 @@ ${note.abc}`;
                     throw new Error('无法生成SVG元素');
                 }
 
-                // 设置最终输出尺寸为800x800（减少空白）
-                const outputSize = 700;
+                // 设置最终输出尺寸（增加高度确保最低音符完整显示）
+                const outputWidth = 700;
+                const outputHeight = 800;
                 
                 // 创建Canvas进行PNG转换
                 const canvas = document.createElement('canvas');
-                canvas.width = outputSize;
-                canvas.height = outputSize;
+                canvas.width = outputWidth;
+                canvas.height = outputHeight;
                 const ctx = canvas.getContext('2d');
 
                 // 设置白色背景
                 ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, outputSize, outputSize);
+                ctx.fillRect(0, 0, outputWidth, outputHeight);
 
                 // 直接获取SVG的原始尺寸
                 const svgWidth = parseFloat(svgElement.getAttribute('width')) || svgElement.getBoundingClientRect().width;
@@ -368,7 +369,7 @@ ${note.abc}`;
                         ctx.save();
                         
                         // 移动到画布中心
-                        ctx.translate(outputSize / 2, outputSize / 2);
+                        ctx.translate(outputWidth / 2, outputHeight / 2);
                         
                         // 使用固定的五线谱目标尺寸，不随PNG尺寸变化
                         const fixedStaffSize = 1100; // 增加到1100px，缩放比例提升到0.92
@@ -470,7 +471,7 @@ ${note.abc}`;
             
             log('🚀 开始生成所有五线谱图片...');
             log(`📊 计划生成 ${trebleNotes.length + bassNotes.length} 张图片`);
-            log('📏 图片规格: 500x500像素, 完美水平居中, 优化ABCJS参数+调试信息');
+            log('📏 图片规格: 700x800像素, 完美水平居中, 优化ABCJS参数+调试信息');
             
             // 禁用按钮
             const buttons = document.querySelectorAll('.btn');
