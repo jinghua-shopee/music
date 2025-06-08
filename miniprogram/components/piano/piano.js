@@ -17,6 +17,7 @@ Component({
   },
 
   data: {
+    scrollLeft: 0, // 键盘滚动位置
     keys: [
       // 第0八度（最低音）- 只有A0, A#0, B0
       { note: 'A0', key: 'a0', type: 'white', x: 0 },
@@ -112,6 +113,10 @@ Component({
   lifetimes: {
     attached() {
       console.log('钢琴组件加载完成')
+      // 延迟执行自动滚动，确保DOM已渲染完成
+      setTimeout(() => {
+        this.scrollToC4()
+      }, 100)
     },
     
     detached() {
@@ -121,6 +126,37 @@ Component({
   },
 
   methods: {
+    // 自动滚动到C4中央C位置
+    scrollToC4() {
+      const query = this.createSelectorQuery()
+      query.select('.piano-container').boundingClientRect()
+      query.exec((res) => {
+        if (res[0]) {
+          const containerWidth = res[0].width
+          const c4Position = 1150 // C4的x坐标位置（rpx）
+          
+          // 将rpx转换为px（微信小程序中，1rpx = 屏幕宽度/750）
+          const systemInfo = wx.getSystemInfoSync()
+          const rpxToPx = systemInfo.windowWidth / 750
+          const c4PositionPx = c4Position * rpxToPx
+          
+          // 计算滚动位置：让C4居中显示
+          const scrollLeft = c4PositionPx - (containerWidth / 2)
+          
+          // 确保滚动位置不为负数，也不超过最大滚动范围
+          const maxScrollLeft = (2250 * rpxToPx) - containerWidth // 总宽度 - 容器宽度
+          const finalScrollLeft = Math.max(0, Math.min(scrollLeft, maxScrollLeft))
+          
+          console.log(`自动滚动到C4: 容器宽度=${containerWidth}px, C4位置=${c4Position}rpx(${c4PositionPx}px), 滚动位置=${finalScrollLeft}px`)
+          
+          // 执行滚动
+          this.setData({
+            scrollLeft: finalScrollLeft
+          })
+        }
+      })
+    },
+
     // 按键点击事件
     onKeyTap(e) {
       const { key, note } = e.currentTarget.dataset

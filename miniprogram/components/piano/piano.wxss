@@ -54,6 +54,43 @@
   animation: highlight-pulse 1s ease-in-out infinite alternate;
 }
 
+/* 中央C的低调高亮样式 */
+.white-key.central-c {
+  border: 3rpx solid #ffd700;
+  background: linear-gradient(180deg, #fff3cd 0%, #ffeaa7 100%);
+  box-shadow: 0 4rpx 8rpx rgba(0,0,0,0.1), 0 0 12rpx rgba(255, 215, 0, 0.3);
+}
+
+.white-key.central-c .key-label {
+  color: #856404;
+  font-weight: 700;
+  font-size: 22rpx;
+}
+
+/* 确保选中状态优先级更高 */
+.white-key.central-c.selected {
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.2);
+}
+
+.white-key.central-c.selected .key-label {
+  color: white;
+}
+
+/* 确保答案高亮优先级最高 */
+.white-key.central-c.highlight {
+  background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+  border-color: #28a745;
+  box-shadow: 0 0 20rpx rgba(40, 167, 69, 0.5);
+  animation: highlight-pulse 1s ease-in-out infinite alternate;
+}
+
+.white-key.central-c.highlight .key-label {
+  color: white;
+  font-weight: 700;
+}
+
 /* 黑键样式 */
 .black-key {
   width: 32rpx;
