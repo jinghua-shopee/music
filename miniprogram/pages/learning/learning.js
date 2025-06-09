@@ -20,7 +20,7 @@ Page({
     
     // 统计数据
     totalQuestions: 0,
-    maxQuestions: 2,
+    maxQuestions: 15,
     correctAnswers: 0,
     wrongAnswers: 0,
     accuracyRate: 0,

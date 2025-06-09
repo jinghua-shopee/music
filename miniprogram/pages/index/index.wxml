@@ -69,11 +69,11 @@
       <text class="section-title">选择题目数量</text>
       <view class="question-options">
         <view 
-          class="question-option {{selectedCount === 2 ? 'active' : ''}} {{!imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
+          class="question-option {{selectedCount === 15 ? 'active' : ''}} {{!imageDownloadStatus.isCompleted ? 'disabled' : ''}}" 
           bindtap="{{imageDownloadStatus.isCompleted ? 'selectCount' : ''}}"
-          data-count="2"
+          data-count="15"
         >
-          <view class="option-number">2</view>
+          <view class="option-number">15</view>
           <view class="option-label">道题</view>
         </view>
         <view 
