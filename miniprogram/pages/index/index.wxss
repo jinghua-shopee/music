@@ -5,7 +5,7 @@
   text-align: center;
 }
 
-/* 图片下载状态 */
+/* 图片和音频下载状态 */
 .download-status {
   margin: 40rpx 0;
   padding: 32rpx;
@@ -84,10 +84,47 @@
   line-height: 1.4;
 }
 
+.error-hint {
+  color: #ff9800;
+  font-size: 24rpx;
+  text-align: center;
+  margin-top: 8rpx;
+  line-height: 1.4;
+}
+
 .retry-btn {
   margin-top: 16rpx;
   padding: 16rpx 32rpx;
   font-size: 28rpx;
+}
+
+/* 下载状态提示 */
+.download-hint {
+  margin: 32rpx 0;
+  padding: 24rpx;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1rpx solid rgba(255, 193, 7, 0.3);
+  border-radius: 16rpx;
+  backdrop-filter: blur(5px);
+}
+
+.hint-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin: 8rpx 0;
+}
+
+.hint-icon {
+  font-size: 32rpx;
+  min-width: 32rpx;
+}
+
+.hint-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 24rpx;
+  line-height: 1.4;
+  flex: 1;
 }
 
 /* 模式选择 */

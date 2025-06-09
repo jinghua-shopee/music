@@ -15,8 +15,27 @@
       
       <view wx:if="{{imageDownloadStatus.error}}" class="download-error">
         <view class="error-icon">⚠️</view>
-        <text class="error-text">图片加载失败：{{imageDownloadStatus.error}}</text>
-        <button class="btn btn-secondary retry-btn" bindtap="retryDownload">重新下载</button>
+        <text class="error-text">五线谱图片加载失败：{{imageDownloadStatus.error}}</text>
+        <button class="btn btn-secondary retry-btn" bindtap="retryImageDownload">重新下载图片</button>
+      </view>
+    </view>
+
+    <!-- 音频下载状态区域 -->
+    <view class="download-status" wx:if="{{audioDownloadStatus.isDownloading || audioDownloadStatus.error}}">
+      <view wx:if="{{audioDownloadStatus.isDownloading}}" class="downloading">
+        <view class="download-icon">🎵</view>
+        <text class="download-text">正在加载钢琴音频...</text>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{audioDownloadStatus.progress}}%"></view>
+        </view>
+        <text class="progress-text">{{audioDownloadStatus.progress}}%</text>
+      </view>
+      
+      <view wx:if="{{audioDownloadStatus.error}}" class="download-error">
+        <view class="error-icon">🔇</view>
+        <text class="error-text">钢琴音频加载失败：{{audioDownloadStatus.error}}</text>
+        <text class="error-hint">音频失败不影响学习，将使用振动反馈</text>
+        <button class="btn btn-secondary retry-btn" bindtap="retryAudioDownload">重新下载音频</button>
       </view>
     </view>
     

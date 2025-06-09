@@ -1,4 +1,5 @@
 const imageManager = require('./utils/imageManager')
+const audioDownloadManager = require('./utils/audioDownloadManager')
 
 App({
   globalData: {
@@ -39,14 +40,25 @@ App({
       isCompleted: false,
       progress: 0,
       error: null
+    },
+
+    // 音频下载状态
+    audioDownloadStatus: {
+      isDownloading: false,
+      isCompleted: false,
+      progress: 0,
+      error: null
     }
   },
 
   async onLaunch() {
     console.log('小程序启动')
     
-    // 初始化图片管理器
-    await this.initializeImages()
+    // 并行初始化图片和音频
+    await Promise.all([
+      this.initializeImages(),
+      this.initializeAudio()
+    ])
   },
 
   /**
@@ -84,6 +96,88 @@ App({
   },
 
   /**
+   * 初始化音频下载
+   */
+  async initializeAudio() {
+    console.log('开始初始化钢琴音频...')
+    
+    this.globalData.audioDownloadStatus.isDownloading = true
+    this.globalData.audioDownloadStatus.error = null
+    
+    try {
+      // 初始化音频下载管理器
+      await audioDownloadManager.initialize()
+      
+      // 更新下载状态
+      this.globalData.audioDownloadStatus.isDownloading = false
+      this.globalData.audioDownloadStatus.isCompleted = true
+      this.globalData.audioDownloadStatus.progress = 100
+      
+      console.log('钢琴音频初始化完成')
+      
+      // 下载完成后删除本地audio/piano目录
+      await this.cleanupLocalAudioDirectory()
+      
+      // 触发全局事件，通知页面音频下载完成
+      this.notifyAudioDownloadComplete()
+      
+    } catch (error) {
+      console.error('钢琴音频初始化失败:', error)
+      
+      this.globalData.audioDownloadStatus.isDownloading = false
+      this.globalData.audioDownloadStatus.error = error.message || '音频下载失败'
+      
+      // 即使下载失败，也要通知页面，让用户知道状态
+      this.notifyAudioDownloadComplete()
+    }
+  },
+
+  /**
+   * 清理本地audio/piano目录
+   */
+  async cleanupLocalAudioDirectory() {
+    try {
+      console.log('开始清理本地audio/piano目录...')
+      
+      const fs = wx.getFileSystemManager()
+      
+      // 检查目录是否存在
+      const exists = await new Promise((resolve) => {
+        fs.access({
+          path: 'audio/piano',
+          success: () => resolve(true),
+          fail: () => resolve(false)
+        })
+      })
+      
+      if (exists) {
+        // 删除目录及其内容
+        await new Promise((resolve, reject) => {
+          fs.rmdir({
+            dirPath: 'audio/piano',
+            recursive: true,
+            success: () => {
+              console.log('本地audio/piano目录删除成功')
+              resolve()
+            },
+            fail: (error) => {
+              console.warn('删除本地audio/piano目录失败:', error)
+              // 不阻塞程序运行，只记录警告
+              resolve()
+            }
+          })
+        })
+      } else {
+        console.log('本地audio/piano目录不存在，无需删除')
+      }
+      
+    } catch (error) {
+      console.warn('清理本地audio/piano目录时出错:', error)
+      // 不抛出错误，避免影响主流程
+    }
+  },
+
+  /**
    * 通知页面图片下载完成
    */
   notifyImageDownloadComplete() {
@@ -100,10 +194,33 @@ App({
   },
 
   /**
+   * 通知页面音频下载完成
+   */
+  notifyAudioDownloadComplete() {
+    // 获取当前页面栈
+    const pages = getCurrentPages()
+    if (pages.length > 0) {
+      const currentPage = pages[pages.length - 1]
+      
+      // 如果当前页面有音频下载完成回调，则调用
+      if (typeof currentPage.onAudioDownloadComplete === 'function') {
+        currentPage.onAudioDownloadComplete(this.globalData.audioDownloadStatus)
+      }
+    }
+  },
+
+  /**
    * 获取图片管理器实例
    */
   getImageManager() {
     return imageManager
+  },
+
+  /**
+   * 获取音频下载管理器实例
+   */
+  getAudioDownloadManager() {
+    return audioDownloadManager
   },
 
   /**
@@ -112,6 +229,15 @@ App({
   getImageDownloadProgress() {
     const progress = imageManager.getDownloadProgress()
     this.globalData.imageDownloadStatus.progress = progress.percentage
+    return progress
+  },
+
+  /**
+   * 获取音频下载进度
+   */
+  getAudioDownloadProgress() {
+    const progress = audioDownloadManager.getDownloadProgress()
+    this.globalData.audioDownloadStatus.progress = progress.percentage
     return progress
   },
 

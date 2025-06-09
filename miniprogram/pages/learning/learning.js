@@ -42,12 +42,21 @@ Page({
     
     // 玩家切换相关状态（简化版）
     showPlayerSwitch: false,
-    countdownNumber: 5
+    countdownNumber: 5,
+
+    // 音频下载状态
+    audioDownloadStatus: {
+      isDownloading: false,
+      isCompleted: false,
+      progress: 0,
+      error: null
+    }
   },
 
   onLoad() {
     console.log('学习页面加载')
     this.initPageData()
+    this.checkAudioDownloadStatus()
   },
 
   onShow() {
@@ -398,5 +407,50 @@ Page({
   // 手动跳过切换流程（点击跳过按钮）
   skipSwitchProcess() {
     this.finishPlayerSwitch()
+  },
+
+  /**
+   * 检查音频下载状态
+   */
+  checkAudioDownloadStatus() {
+    const audioDownloadStatus = app.globalData.audioDownloadStatus
+    this.setData({
+      audioDownloadStatus: audioDownloadStatus
+    })
+    
+    console.log('音频下载状态:', audioDownloadStatus)
+    
+    if (audioDownloadStatus.isCompleted) {
+      console.log('🎵 音频文件已下载完成，可以使用远程音频文件')
+    } else if (audioDownloadStatus.isDownloading) {
+      console.log('🔄 音频文件正在下载中...')
+    } else if (audioDownloadStatus.error) {
+      console.warn('❌ 音频下载失败:', audioDownloadStatus.error)
+    }
+  },
+
+  /**
+   * 音频下载完成回调
+   */
+  onAudioDownloadComplete(status) {
+    console.log('音频下载完成回调:', status)
+    this.setData({
+      audioDownloadStatus: status
+    })
+    
+    if (status.isCompleted && !status.error) {
+      wx.showToast({
+        title: '音频文件下载完成',
+        icon: 'success',
+        duration: 2000
+      })
+      console.log('🎉 音频文件下载完成，现在可以享受高质量的钢琴音效！')
+    } else if (status.error) {
+      wx.showToast({
+        title: '音频下载失败',
+        icon: 'none',
+        duration: 3000
+      })
+    }
   }
 }) 

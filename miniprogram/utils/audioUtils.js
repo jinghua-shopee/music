@@ -4,6 +4,7 @@
  */
 
 const { pianoKeyMapping } = require('./pianoKeyMapping.js')
+const audioDownloadManager = require('./audioDownloadManager.js')
 
 class AudioManager {
   constructor() {
@@ -253,8 +254,16 @@ class AudioManager {
       return null
     }
     
-    // 使用新的文件命名方式
-    return `/audio/piano/${noteKey}.mp3`
+    // 优先使用下载的音频文件
+    const localPath = audioDownloadManager.getLocalAudioPath(noteKey)
+    if (localPath) {
+      console.log(`使用下载的音频文件: ${noteKey} -> ${localPath}`)
+      return localPath
+    }
+    
+    // 如果没有下载的文件，直接返回null，使用振动反馈
+    console.warn(`音频文件未下载: ${noteKey}，将使用振动反馈`)
+    return null
   }
 
   // 播放音符

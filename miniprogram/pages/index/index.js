@@ -13,19 +13,27 @@ Page({
       isCompleted: false,
       progress: 0,
       error: null
+    },
+    // 音频下载状态
+    audioDownloadStatus: {
+      isDownloading: true,
+      isCompleted: false,
+      progress: 0,
+      error: null
     }
   },
 
   onLoad() {
     console.log('首页加载')
     
-    // 获取当前图片下载状态
+    // 获取当前图片和音频下载状态
     this.setData({
-      imageDownloadStatus: app.globalData.imageDownloadStatus
+      imageDownloadStatus: app.globalData.imageDownloadStatus,
+      audioDownloadStatus: app.globalData.audioDownloadStatus
     })
     
     // 如果还在下载中，开始轮询进度
-    if (this.data.imageDownloadStatus.isDownloading) {
+    if (this.data.imageDownloadStatus.isDownloading || this.data.audioDownloadStatus.isDownloading) {
       this.startProgressPolling()
     }
   },
@@ -33,9 +41,10 @@ Page({
   onShow() {
     console.log('首页显示')
     
-    // 更新图片下载状态
+    // 更新图片和音频下载状态
     this.setData({
-      imageDownloadStatus: app.globalData.imageDownloadStatus
+      imageDownloadStatus: app.globalData.imageDownloadStatus,
+      audioDownloadStatus: app.globalData.audioDownloadStatus
     })
   },
 
@@ -51,14 +60,39 @@ Page({
     
     if (status.isCompleted && !status.error) {
       wx.showToast({
-        title: '图片加载完成',
+        title: '五线谱图片加载完成',
         icon: 'success',
         duration: 2000
       })
     } else if (status.error) {
       wx.showToast({
-        title: '图片加载失败',
+        title: '五线谱图片加载失败',
         icon: 'error',
+        duration: 3000
+      })
+    }
+  },
+
+  /**
+   * 音频下载完成回调（由app.js调用）
+   */
+  onAudioDownloadComplete(status) {
+    console.log('首页收到音频下载完成通知:', status)
+    
+    this.setData({
+      audioDownloadStatus: status
+    })
+    
+    if (status.isCompleted && !status.error) {
+      wx.showToast({
+        title: '钢琴音频加载完成',
+        icon: 'success',
+        duration: 2000
+      })
+    } else if (status.error) {
+      wx.showToast({
+        title: '钢琴音频加载失败',
+        icon: 'none',
         duration: 3000
       })
     }
@@ -69,16 +103,21 @@ Page({
    */
   startProgressPolling() {
     const timer = setInterval(() => {
-      const progress = app.getImageDownloadProgress()
+      // 获取图片下载进度
+      const imageProgress = app.getImageDownloadProgress()
+      const audioProgress = app.getAudioDownloadProgress()
       
       this.setData({
-        'imageDownloadStatus.progress': progress.percentage
+        'imageDownloadStatus.progress': imageProgress.percentage,
+        'audioDownloadStatus.progress': audioProgress.percentage
       })
       
-      console.log('图片下载进度:', progress)
+      console.log('图片下载进度:', imageProgress)
+      console.log('音频下载进度:', audioProgress)
       
-      // 如果下载完成或出错，停止轮询
-      if (!app.globalData.imageDownloadStatus.isDownloading) {
+      // 如果都下载完成或出错，停止轮询
+      if (!app.globalData.imageDownloadStatus.isDownloading && 
+          !app.globalData.audioDownloadStatus.isDownloading) {
         clearInterval(timer)
       }
     }, 1000)
@@ -87,11 +126,11 @@ Page({
   /**
    * 重新下载图片
    */
-  async retryDownload() {
+  async retryImageDownload() {
     console.log('重新下载图片')
     
     wx.showLoading({
-      title: '正在重新下载...',
+      title: '正在重新下载五线谱...',
       mask: true
     })
     
@@ -101,18 +140,50 @@ Page({
       wx.hideLoading()
       
       wx.showToast({
-        title: '重新下载完成',
+        title: '五线谱重新下载完成',
         icon: 'success'
       })
     } catch (error) {
       wx.hideLoading()
       
       wx.showToast({
-        title: '重新下载失败',
+        title: '五线谱重新下载失败',
         icon: 'error'
       })
       
-      console.error('重新下载失败:', error)
+      console.error('重新下载图片失败:', error)
+    }
+  },
+
+  /**
+   * 重新下载音频
+   */
+  async retryAudioDownload() {
+    console.log('重新下载音频')
+    
+    wx.showLoading({
+      title: '正在重新下载音频...',
+      mask: true
+    })
+    
+    try {
+      await app.initializeAudio()
+      
+      wx.hideLoading()
+      
+      wx.showToast({
+        title: '音频重新下载完成',
+        icon: 'success'
+      })
+    } catch (error) {
+      wx.hideLoading()
+      
+      wx.showToast({
+        title: '音频重新下载失败',
+        icon: 'error'
+      })
+      
+      console.error('重新下载音频失败:', error)
     }
   },
 
@@ -169,11 +240,20 @@ Page({
     // 检查图片是否已下载完成
     if (!this.data.imageDownloadStatus.isCompleted) {
       wx.showToast({
-        title: '图片尚未加载完成',
+        title: '五线谱图片尚未加载完成',
         icon: 'none',
         duration: 2000
       })
       return
+    }
+
+    // 音频下载失败不阻塞游戏开始，但给出提示
+    if (!this.data.audioDownloadStatus.isCompleted) {
+      wx.showToast({
+        title: '音频尚未加载完成，将使用振动反馈',
+        icon: 'none',
+        duration: 3000
+      })
     }
     
     console.log('开始学习:', {
