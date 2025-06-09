@@ -296,6 +296,50 @@
   border-radius: 16rpx;
   font-size: 32rpx;
   font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  animation: victoryPulse 2s ease-in-out infinite;
+  box-shadow: 0 8rpx 32rpx rgba(102, 126, 234, 0.4);
+}
+
+.final-winner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    transparent 70%);
+  animation: victoryShine 3s ease-in-out infinite;
+  transform: rotate(45deg);
+}
+
+/* 获胜者文字动画效果 */
+@keyframes victoryPulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 
+      0 8rpx 32rpx rgba(102, 126, 234, 0.4),
+      0 0 0rpx rgba(255, 215, 0, 0);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 
+      0 12rpx 40rpx rgba(102, 126, 234, 0.6),
+      0 0 20rpx rgba(255, 215, 0, 0.3);
+  }
+}
+
+@keyframes victoryShine {
+  0% { 
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% { 
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
 }
 
 /* 总结操作按钮 */
@@ -850,5 +894,104 @@
   100% { 
     transform: translateY(-50%) scale(1) rotateY(360deg) rotateZ(0deg);
     filter: brightness(1) drop-shadow(0 0 4rpx rgba(255, 215, 0, 0.3));
+  }
+}
+
+/* 获胜者震撼动效 🏆 */
+.player-header.winner {
+  position: relative;
+  animation: winnerGlow 2s ease-in-out infinite;
+}
+
+.winner-icon {
+  position: relative;
+  animation: championDance 2s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 16rpx rgba(255, 215, 0, 0.8));
+  z-index: 5;
+  transform: scale(1.2);
+}
+
+.winner-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle, 
+    rgba(255, 215, 0, 0.5) 0%, 
+    rgba(255, 215, 0, 0.2) 50%, 
+    transparent 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: auraExpand 1.2s ease-in-out infinite;
+  z-index: -1;
+}
+
+.winner-icon::after {
+  content: '✨';
+  position: absolute;
+  top: -15rpx;
+  left: -15rpx;
+  font-size: 28rpx;
+  animation: sparkle 0.8s ease-in-out infinite;
+  z-index: 10;
+  filter: drop-shadow(0 0 6rpx rgba(255, 215, 0, 0.8));
+}
+
+/* 获胜者动画效果 */
+@keyframes winnerGlow {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 20rpx rgba(255, 215, 0, 0.4);
+  }
+  50% { 
+    transform: scale(1.15);
+    box-shadow: 0 0 50rpx rgba(255, 215, 0, 1);
+  }
+}
+
+@keyframes championDance {
+  0%, 100% { 
+    transform: scale(1.2) rotate(0deg);
+    filter: drop-shadow(0 0 16rpx rgba(255, 215, 0, 0.8));
+  }
+  20% { 
+    transform: scale(1.7) rotate(-10deg);
+    filter: drop-shadow(0 0 32rpx rgba(255, 215, 0, 1.5));
+  }
+  40% { 
+    transform: scale(1.9) rotate(8deg);
+    filter: drop-shadow(0 0 40rpx rgba(255, 215, 0, 1.8));
+  }
+  60% { 
+    transform: scale(1.8) rotate(-6deg);
+    filter: drop-shadow(0 0 36rpx rgba(255, 215, 0, 1.6));
+  }
+  80% { 
+    transform: scale(1.5) rotate(4deg);
+    filter: drop-shadow(0 0 28rpx rgba(255, 215, 0, 1.2));
+  }
+}
+
+@keyframes auraExpand {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0.1;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0;
+    transform: translateY(0) scale(0.3);
+  }
+  50% { 
+    opacity: 1;
+    transform: translateY(-16rpx) scale(1.3);
   }
 } 

@@ -109,13 +109,13 @@
       <view wx:if="{{gameMode === 'pk'}}" class="pk-comparison">
         <!-- 玩家标识头部 -->
         <view class="pk-players-header">
-          <view class="player-header player1-header">
-            <view class="player-icon">🐰</view>
+          <view class="player-header player1-header {{(player1AccuracyRate > player2AccuracyRate) || (player1AccuracyRate === player2AccuracyRate && player1AverageReactionTime < player2AverageReactionTime && player1AverageReactionTime > 0) ? 'winner' : ''}}">
+            <view class="player-icon {{(player1AccuracyRate > player2AccuracyRate) || (player1AccuracyRate === player2AccuracyRate && player1AverageReactionTime < player2AverageReactionTime && player1AverageReactionTime > 0) ? 'winner-icon' : ''}}">🐰</view>
             <text class="player-name">玩家1</text>
           </view>
           <view class="vs-header">VS</view>
-          <view class="player-header player2-header">
-            <view class="player-icon">🐹</view>
+          <view class="player-header player2-header {{(player2AccuracyRate > player1AccuracyRate) || (player1AccuracyRate === player2AccuracyRate && player2AverageReactionTime < player1AverageReactionTime && player2AverageReactionTime > 0) ? 'winner' : ''}}">
+            <view class="player-icon {{(player2AccuracyRate > player1AccuracyRate) || (player1AccuracyRate === player2AccuracyRate && player2AverageReactionTime < player1AverageReactionTime && player2AverageReactionTime > 0) ? 'winner-icon' : ''}}">🐹</view>
             <text class="player-name">玩家2</text>
           </view>
         </view>
@@ -127,12 +127,12 @@
               <view class="stat-label">正确率</view>
               <view class="stat-comparison">
                 <view class="player-stat player1-stat">
-                  <text wx:if="{{player1AccuracyRate > player2AccuracyRate}}" class="crown">👑</text>
+                  <text wx:if="{{(player1AccuracyRate > player2AccuracyRate) || (player1AccuracyRate === player2AccuracyRate && player1AverageReactionTime < player2AverageReactionTime && player1AverageReactionTime > 0)}}" class="crown">👑</text>
                   {{player1AccuracyRate}}%
                 </view>
                 <view class="vs-divider">VS</view>
                 <view class="player-stat player2-stat">
-                  <text wx:if="{{player2AccuracyRate > player1AccuracyRate}}" class="crown">👑</text>
+                  <text wx:if="{{(player2AccuracyRate > player1AccuracyRate) || (player1AccuracyRate === player2AccuracyRate && player2AverageReactionTime < player1AverageReactionTime && player2AverageReactionTime > 0)}}" class="crown">👑</text>
                   {{player2AccuracyRate}}%
                 </view>
               </view>
