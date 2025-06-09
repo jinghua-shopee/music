@@ -20,10 +20,14 @@ Page({
     
     // 统计数据
     totalQuestions: 0,
+    maxQuestions: 15,
     correctAnswers: 0,
     wrongAnswers: 0,
     accuracyRate: 0,
     averageReactionTime: 0,
+    
+    // 显示相关
+    progressNumberText: '',
     
     // PK模式数据
     player1AccuracyRate: 0,
@@ -87,13 +91,23 @@ Page({
     
     console.log('更新数据，当前音符:', globalData.currentNote)
     
+    // 计算进度显示文本
+    let progressNumberText = ''
+    if (globalData.maxQuestions === Infinity) {
+      progressNumberText = globalData.totalQuestions.toString()
+    } else {
+      progressNumberText = `${globalData.totalQuestions}/${globalData.maxQuestions}`
+    }
+    
     this.setData({
       currentNote: globalData.currentNote,
       selectedKey: globalData.selectedKey,
       hasShownJianpu: globalData.hasShownJianpu,
       totalQuestions: globalData.totalQuestions,
       correctAnswers: globalData.correctAnswers,
-      wrongAnswers: globalData.wrongAnswers
+      wrongAnswers: globalData.wrongAnswers,
+      maxQuestions: globalData.maxQuestions,
+      progressNumberText: progressNumberText
     })
     
     console.log('更新后的页面音符数据:', this.data.currentNote)

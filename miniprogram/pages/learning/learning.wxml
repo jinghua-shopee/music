@@ -73,7 +73,7 @@
   <view wx:if="{{showSummaryModal}}" class="modal">
     <view class="modal-content">
       <view class="summary-header">
-        <view class="summary-icon">🎉</view>
+        <view class="summary-icon celebration-emoji">🎉</view>
         <text class="summary-title">{{gameMode === 'pk' ? 'PK对战总结' : '学习总结'}}</text>
       </view>
       
@@ -149,22 +149,30 @@
   
   <!-- 确认退出弹窗 -->
   <view wx:if="{{showExitConfirm}}" class="modal">
-    <view class="modal-content">
+    <view class="modal-content exit-modal-content">
       <view class="exit-header">
-        <view class="exit-icon">🤔</view>
-        <text class="exit-title">{{gameMode === 'pk' ? '确认退出PK？' : '确认退出学习'}}</text>
+        <view class="exit-icon thinking-emoji">🤔</view>
+        <text class="exit-title">{{gameMode === 'pk' ? '确认退出PK？' : '确认退出学习？'}}</text>
       </view>
       <view class="exit-progress">
         <view class="progress-circle">
-          <view class="progress-number">{{totalQuestions}}</view>
+          <view class="progress-number">{{progressNumberText}}</view>
           <view class="progress-label">已完成题数</view>
         </view>
       </view>
-      <text class="exit-message">您已经完成了 {{totalQuestions}} 道题，是否要退出并查看学习报告？</text>
       <view class="exit-actions">
-        <button class="btn btn-primary" bindtap="exitWithReport">查看报告并退出</button>
-        <button class="btn btn-outline" bindtap="cancelExit">{{gameMode === 'pk' ? '继续PK' : '继续学习'}}</button>
-        <button class="btn btn-danger" bindtap="exitDirectly">直接退出</button>
+        <button class="btn btn-report" bindtap="exitWithReport">
+          <view class="btn-icon">📊</view>
+          <text class="btn-text">查看报告并退出</text>
+        </button>
+        <button class="btn btn-continue" bindtap="cancelExit">
+          <view class="btn-icon">💪</view>
+          <text class="btn-text">{{gameMode === 'pk' ? '继续PK' : '继续学习'}}</text>
+        </button>
+        <button class="btn btn-quit" bindtap="exitDirectly">
+          <view class="btn-icon">🚪</view>
+          <text class="btn-text">直接退出</text>
+        </button>
       </view>
     </view>
   </view>

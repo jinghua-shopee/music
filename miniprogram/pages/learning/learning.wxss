@@ -115,6 +115,35 @@
   margin-bottom: 16rpx;
 }
 
+.celebration-emoji {
+  animation: celebrate 2s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes celebrate {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg);
+  }
+  15% { 
+    transform: scale(1.2) rotate(-5deg);
+  }
+  30% { 
+    transform: scale(1.1) rotate(5deg);
+  }
+  45% { 
+    transform: scale(1.15) rotate(-3deg);
+  }
+  60% { 
+    transform: scale(1.05) rotate(3deg);
+  }
+  75% { 
+    transform: scale(1.1) rotate(-1deg);
+  }
+  90% { 
+    transform: scale(1.02) rotate(1deg);
+  }
+}
+
 .summary-title {
   display: block;
   font-size: 40rpx;
@@ -264,35 +293,76 @@
 }
 
 /* 退出确认弹窗 */
-.exit-header {
-  text-align: center;
-  margin-bottom: 32rpx;
+.exit-modal-content {
+  background: #ffffff;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.3);
 }
 
-.exit-icon {
+.exit-modal-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    rgba(102, 126, 234, 0.05) 0%, 
+    transparent 20%, 
+    transparent 80%, 
+    rgba(102, 126, 234, 0.05) 100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(30deg); }
+}
+
+.exit-header {
+  text-align: center;
+  margin-bottom: 40rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.thinking-emoji {
   font-size: 80rpx;
   margin-bottom: 16rpx;
+  animation: wiggle 2s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
 }
 
 .exit-title {
   display: block;
   font-size: 36rpx;
   font-weight: 600;
-  color: #333;
+  color: #333333;
+  text-shadow: none;
 }
 
 .exit-progress {
   text-align: center;
-  margin-bottom: 32rpx;
+  margin-bottom: 40rpx;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20rpx 0;
+  position: relative;
+  z-index: 2;
 }
 
 .progress-circle {
-  width: 140rpx;
-  height: 140rpx;
+  width: 160rpx;
+  height: 160rpx;
   border: 6rpx solid #667eea;
   border-radius: 50%;
   display: flex;
@@ -300,88 +370,119 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(102, 126, 234, 0.05));
-  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
-  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 8rpx 32rpx rgba(102, 126, 234, 0.2);
+  backdrop-filter: blur(10px);
+  animation: float 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px);
+    box-shadow: 0 8rpx 32rpx rgba(102, 126, 234, 0.2);
   }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 12rpx 32rpx rgba(102, 126, 234, 0.3);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
+  50% { 
+    transform: translateY(-8rpx);
+    box-shadow: 0 16rpx 40rpx rgba(102, 126, 234, 0.3);
   }
 }
 
 .progress-number {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #667eea;
-  text-shadow: 0 2rpx 4rpx rgba(102, 126, 234, 0.1);
+  text-shadow: none;
+  line-height: 1;
 }
 
 .progress-label {
   font-size: 22rpx;
   color: #667eea;
-  margin-top: 4rpx;
+  margin-top: 6rpx;
   font-weight: 500;
-}
-
-.exit-message {
-  text-align: center;
-  margin-bottom: 32rpx;
-  line-height: 1.6;
-  color: #666;
-  font-size: 28rpx;
-  padding: 0 20rpx;
+  text-shadow: none;
 }
 
 .exit-actions {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 20rpx;
+  position: relative;
+  z-index: 2;
 }
 
-/* 退出弹窗按钮样式 */
-.exit-actions .btn-primary {
+/* 重新设计的按钮样式 */
+.exit-actions .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 24rpx 32rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.exit-actions .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.exit-actions .btn:active::before {
+  left: 100%;
+}
+
+.btn-report {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-  color: white;
+  color: #ffffff;
   box-shadow: 0 8rpx 24rpx rgba(78, 205, 196, 0.4);
-  font-weight: 600;
 }
 
-.exit-actions .btn-primary:active {
+.btn-report:active {
   transform: translateY(2rpx);
-  box-shadow: 0 4rpx 12rpx rgba(78, 205, 196, 0.4);
+  box-shadow: 0 4rpx 16rpx rgba(78, 205, 196, 0.4);
 }
 
-.exit-actions .btn-outline {
-  background: transparent;
-  color: #667eea;
-  border: 2rpx solid #667eea;
-  font-weight: 600;
+.btn-continue {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #2c3e50;
+  box-shadow: 0 8rpx 24rpx rgba(168, 237, 234, 0.4);
 }
 
-.exit-actions .btn-outline:active {
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.exit-actions .btn-danger {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  color: #8B4513;
-  box-shadow: 0 8rpx 24rpx rgba(255, 236, 210, 0.4);
-  font-weight: 600;
-}
-
-.exit-actions .btn-danger:active {
+.btn-continue:active {
   transform: translateY(2rpx);
-  box-shadow: 0 4rpx 12rpx rgba(255, 236, 210, 0.4);
+  box-shadow: 0 4rpx 16rpx rgba(168, 237, 234, 0.4);
+}
+
+.btn-quit {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+  color: #2d3436;
+  box-shadow: 0 8rpx 24rpx rgba(255, 234, 167, 0.4);
+}
+
+.btn-quit:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 16rpx rgba(255, 234, 167, 0.4);
+}
+
+.btn-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1;
 }
 
 /* 响应式设计 - 更小屏幕 */
