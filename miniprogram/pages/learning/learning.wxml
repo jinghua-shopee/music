@@ -55,7 +55,7 @@
       >
         查看总结
       </button>
-      <button class="btn btn-danger control-btn" bindtap="handleEndGame">{{endButtonText}}</button>
+      <button class="btn btn-exit control-btn" bindtap="handleEndGame">{{endButtonText}}</button>
     </view>
     
     <!-- 钢琴键盘 -->
@@ -141,8 +141,8 @@
       </view>
       
       <view class="summary-actions">
-        <button class="btn btn-primary" bindtap="restartGame">再来一次</button>
-        <button class="btn btn-danger" bindtap="closeSummaryAndGoBack">返回首页</button>
+        <button class="btn btn-confirm" bindtap="restartGame">再来一次</button>
+        <button class="btn btn-exit" bindtap="closeSummaryAndGoBack">返回首页</button>
       </view>
     </view>
   </view>
@@ -161,18 +161,9 @@
         </view>
       </view>
       <view class="exit-actions">
-        <button class="btn btn-report" bindtap="exitWithReport">
-          <view class="btn-icon">📊</view>
-          <text class="btn-text">查看报告并退出</text>
-        </button>
-        <button class="btn btn-continue" bindtap="cancelExit">
-          <view class="btn-icon">💪</view>
-          <text class="btn-text">{{gameMode === 'pk' ? '继续PK' : '继续学习'}}</text>
-        </button>
-        <button class="btn btn-quit" bindtap="exitDirectly">
-          <view class="btn-icon">🚪</view>
-          <text class="btn-text">直接退出</text>
-        </button>
+        <button class="btn btn-confirm" bindtap="exitWithReport">📊 查看报告</button>
+        <button class="btn btn-continue" bindtap="cancelExit">💪 {{gameMode === 'pk' ? '继续PK' : '继续学习'}}</button>
+        <button class="btn btn-exit" bindtap="exitDirectly">🚪 直接退出</button>
       </view>
     </view>
   </view>

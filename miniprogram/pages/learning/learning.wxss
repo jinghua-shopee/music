@@ -87,6 +87,18 @@
   box-shadow: 0 4rpx 12rpx rgba(17, 197, 130, 0.4);
 }
 
+.controls .btn-exit {
+  background: linear-gradient(135deg, #ff7b7b 0%, #ff5722 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(255, 123, 123, 0.4);
+  font-weight: 600;
+}
+
+.controls .btn-exit:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(255, 123, 123, 0.4);
+}
+
 .controls .btn-danger {
   background: linear-gradient(135deg, #ff7b7b 0%, #ff5722 100%);
   color: white;
@@ -412,10 +424,6 @@
 
 /* 重新设计的按钮样式 */
 .exit-actions .btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
   padding: 24rpx 32rpx;
   border-radius: 16rpx;
   font-size: 30rpx;
@@ -441,48 +449,15 @@
   left: 100%;
 }
 
-.btn-report {
-  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-  color: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(78, 205, 196, 0.4);
-}
-
-.btn-report:active {
-  transform: translateY(2rpx);
-  box-shadow: 0 4rpx 16rpx rgba(78, 205, 196, 0.4);
-}
-
 .btn-continue {
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-  color: #2c3e50;
-  box-shadow: 0 8rpx 24rpx rgba(168, 237, 234, 0.4);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
 }
 
 .btn-continue:active {
   transform: translateY(2rpx);
-  box-shadow: 0 4rpx 16rpx rgba(168, 237, 234, 0.4);
-}
-
-.btn-quit {
-  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
-  color: #2d3436;
-  box-shadow: 0 8rpx 24rpx rgba(255, 234, 167, 0.4);
-}
-
-.btn-quit:active {
-  transform: translateY(2rpx);
-  box-shadow: 0 4rpx 16rpx rgba(255, 234, 167, 0.4);
-}
-
-.btn-icon {
-  font-size: 32rpx;
-  line-height: 1;
-}
-
-.btn-text {
-  font-size: 28rpx;
-  font-weight: 600;
-  line-height: 1;
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.4);
 }
 
 /* 响应式设计 - 更小屏幕 */

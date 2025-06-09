@@ -77,7 +77,7 @@
     </view>
 
     <button 
-      class="btn btn-primary start-btn {{!canStart || !imageDownloadStatus.isCompleted ? 'btn-disabled' : ''}}" 
+      class="btn btn-confirm start-btn {{!canStart || !imageDownloadStatus.isCompleted ? 'btn-disabled' : ''}}" 
       bindtap="startLearning"
       disabled="{{!canStart || !imageDownloadStatus.isCompleted}}"
     >
