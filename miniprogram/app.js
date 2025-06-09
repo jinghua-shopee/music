@@ -4,7 +4,7 @@ App({
   globalData: {
     // 游戏基本状态
     gameMode: '', // 'practice' | 'pk'
-    maxQuestions: 15,
+    maxQuestions: 2,
     currentQuestionIndex: 0,
     
     // 当前题目状态

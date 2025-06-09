@@ -20,7 +20,7 @@ Page({
     
     // 统计数据
     totalQuestions: 0,
-    maxQuestions: 15,
+    maxQuestions: 2,
     correctAnswers: 0,
     wrongAnswers: 0,
     accuracyRate: 0,
@@ -38,7 +38,11 @@ Page({
     
     // 弹窗状态
     showSummaryModal: false,
-    showExitConfirm: false
+    showExitConfirm: false,
+    
+    // 玩家切换相关状态（简化版）
+    showPlayerSwitch: false,
+    countdownNumber: 5
   },
 
   onLoad() {
@@ -123,7 +127,14 @@ Page({
     
     // 更新进度文本
     let progressText = ''
-    if (globalData.maxQuestions === Infinity) {
+    if (globalData.gameMode === 'pk') {
+      // PK模式：显示当前玩家的进度
+      const currentPlayerStats = globalData.currentPlayer === 1 ? 
+        globalData.player1Stats : globalData.player2Stats
+      const currentPlayerTotal = currentPlayerStats.correct + currentPlayerStats.wrong
+      const remaining = Math.max(0, globalData.maxQuestions - currentPlayerTotal)
+      progressText = `玩家${globalData.currentPlayer}: ${currentPlayerTotal}/${globalData.maxQuestions} (剩余 ${remaining} 题)`
+    } else if (globalData.maxQuestions === Infinity) {
       progressText = `${globalData.totalQuestions} 题 (无尽模式)`
     } else {
       const remaining = Math.max(0, globalData.maxQuestions - globalData.totalQuestions)
@@ -134,8 +145,17 @@ Page({
     const endButtonText = globalData.gameMode === 'pk' ? '退出PK' : '结束学习'
     
     // 检查游戏是否完成
-    const isGameCompleted = globalData.maxQuestions !== Infinity && 
-      globalData.totalQuestions >= globalData.maxQuestions
+    let isGameCompleted = false
+    if (globalData.gameMode === 'pk') {
+      // PK模式：只有当两个玩家都完成各自的题目数量后才算游戏完成
+      const player1Total = globalData.player1Stats.correct + globalData.player1Stats.wrong
+      const player2Total = globalData.player2Stats.correct + globalData.player2Stats.wrong
+      isGameCompleted = player1Total >= globalData.maxQuestions && player2Total >= globalData.maxQuestions
+    } else {
+      // 练习模式：达到题目数量限制即完成
+      isGameCompleted = globalData.maxQuestions !== Infinity && 
+        globalData.totalQuestions >= globalData.maxQuestions
+    }
     
     // 计算统计数据
     const accuracyRate = app.getAccuracyRate()
@@ -198,15 +218,6 @@ Page({
   nextQuestion() {
     const globalData = app.globalData
     
-    // 检查是否达到题目数量限制
-    if (globalData.maxQuestions !== Infinity && 
-        globalData.totalQuestions >= globalData.maxQuestions) {
-      this.setData({
-        isGameCompleted: true
-      })
-      return
-    }
-    
     // PK模式处理
     if (globalData.gameMode === 'pk') {
       const currentPlayerStats = globalData.currentPlayer === 1 ? 
@@ -216,16 +227,9 @@ Page({
       if (currentPlayerTotal >= globalData.maxQuestions) {
         // 当前玩家完成，切换到下一个玩家或结束游戏
         if (globalData.currentPlayer === 1) {
-          globalData.currentPlayer = 2
-          this.setData({
-            currentPlayer: 2
-          })
-          wx.showModal({
-            title: '玩家切换',
-            content: '请玩家2开始答题',
-            showCancel: false,
-            confirmText: '开始'
-          })
+          // 启动玩家切换流程
+          this.startPlayerSwitchProcess()
+          return
         } else {
           // 两个玩家都完成
           this.setData({
@@ -233,6 +237,15 @@ Page({
           })
           return
         }
+      }
+    } else {
+      // 练习模式：检查是否达到题目数量限制
+      if (globalData.maxQuestions !== Infinity && 
+          globalData.totalQuestions >= globalData.maxQuestions) {
+        this.setData({
+          isGameCompleted: true
+        })
+        return
       }
     }
     
@@ -329,5 +342,61 @@ Page({
       showExitConfirm: false
     })
     wx.navigateBack()
+  },
+
+  // ==================== 玩家切换增强体验 ====================
+  
+  // 启动玩家切换流程
+  startPlayerSwitchProcess() {
+    this.setData({
+      showPlayerSwitch: true,
+      countdownNumber: 5
+    })
+    
+    // 直接开始倒计时
+    this.startCountdown()
+  },
+  
+  // 开始倒计时
+  startCountdown() {
+    // 倒计时动画
+    const countdownInterval = setInterval(() => {
+      if (this.data.countdownNumber > 1) {
+        this.setData({
+          countdownNumber: this.data.countdownNumber - 1
+        })
+      } else {
+        clearInterval(countdownInterval)
+        // 倒计时结束，正式切换到玩家2
+        this.finishPlayerSwitch()
+      }
+    }, 1000)
+  },
+  
+  // 完成玩家切换
+  finishPlayerSwitch() {
+    const globalData = app.globalData
+    
+    // 切换到玩家2
+    globalData.currentPlayer = 2
+    
+    // 生成新题目
+    app.nextQuestion()
+    
+    // 关闭切换界面，更新数据
+    this.setData({
+      showPlayerSwitch: false,
+      currentPlayer: 2
+    })
+    
+    this.updateData()
+    
+    // 振动反馈
+    wx.vibrateShort()
+  },
+  
+  // 手动跳过切换流程（点击跳过按钮）
+  skipSwitchProcess() {
+    this.finishPlayerSwitch()
   }
 }) 

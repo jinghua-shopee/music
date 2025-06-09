@@ -107,30 +107,50 @@
       
       <!-- PK模式对比 -->
       <view wx:if="{{gameMode === 'pk'}}" class="pk-comparison">
-        <view class="pk-stats-grid">
-          <view class="pk-stat-row">
-            <view class="stat-header">正确率</view>
-            <view class="player-stat">
-              <text wx:if="{{player1AccuracyRate > player2AccuracyRate}}" class="crown">👑</text>
-              {{player1AccuracyRate}}%
-            </view>
-            <view class="vs-divider">VS</view>
-            <view class="player-stat">
-              <text wx:if="{{player2AccuracyRate > player1AccuracyRate}}" class="crown">👑</text>
-              {{player2AccuracyRate}}%
-            </view>
+        <!-- 玩家标识头部 -->
+        <view class="pk-players-header">
+          <view class="player-header player1-header">
+            <view class="player-icon">🐰</view>
+            <text class="player-name">玩家1</text>
           </view>
-          
-          <view class="pk-stat-row">
-            <view class="stat-header">平均时间</view>
-            <view class="player-stat">
-              <text wx:if="{{player1AverageReactionTime < player2AverageReactionTime && player1AverageReactionTime > 0}}" class="crown">👑</text>
-              {{player1AverageReactionTime}}秒
+          <view class="vs-header">VS</view>
+          <view class="player-header player2-header">
+            <view class="player-icon">🐹</view>
+            <text class="player-name">玩家2</text>
+          </view>
+        </view>
+        
+        <view class="pk-stats-grid">
+          <!-- 合并显示正确率和平均时间 -->
+          <view class="pk-combined-stats">
+            <view class="combined-stat-item">
+              <view class="stat-label">正确率</view>
+              <view class="stat-comparison">
+                <view class="player-stat player1-stat">
+                  <text wx:if="{{player1AccuracyRate > player2AccuracyRate}}" class="crown">👑</text>
+                  {{player1AccuracyRate}}%
+                </view>
+                <view class="vs-divider">VS</view>
+                <view class="player-stat player2-stat">
+                  <text wx:if="{{player2AccuracyRate > player1AccuracyRate}}" class="crown">👑</text>
+                  {{player2AccuracyRate}}%
+                </view>
+              </view>
             </view>
-            <view class="vs-divider">VS</view>
-            <view class="player-stat">
-              <text wx:if="{{player2AverageReactionTime < player1AverageReactionTime && player2AverageReactionTime > 0}}" class="crown">👑</text>
-              {{player2AverageReactionTime}}秒
+            
+            <view class="combined-stat-item">
+              <view class="stat-label">平均时间</view>
+              <view class="stat-comparison">
+                <view class="player-stat player1-stat">
+                  <text wx:if="{{player1AverageReactionTime < player2AverageReactionTime && player1AverageReactionTime > 0}}" class="crown">👑</text>
+                  {{player1AverageReactionTime}}秒
+                </view>
+                <view class="vs-divider">VS</view>
+                <view class="player-stat player2-stat">
+                  <text wx:if="{{player2AverageReactionTime < player1AverageReactionTime && player2AverageReactionTime > 0}}" class="crown">👑</text>
+                  {{player2AverageReactionTime}}秒
+                </view>
+              </view>
             </view>
           </view>
         </view>
@@ -165,6 +185,25 @@
         <button class="btn btn-continue" bindtap="cancelExit">💪 {{gameMode === 'pk' ? '继续PK' : '继续学习'}}</button>
         <button class="btn btn-exit" bindtap="exitDirectly">🚪 直接退出</button>
       </view>
+    </view>
+  </view>
+
+  <!-- 玩家切换增强体验 -->
+  <view wx:if="{{showPlayerSwitch}}" class="player-switch-modal">
+    <!-- 玩家切换倒计时 -->
+    <view class="switch-content player-switch-countdown">
+      <view class="switch-header">
+        <view class="player-badge">🎮</view>
+        <text class="switch-title">玩家1已完成！</text>
+        <text class="switch-subtitle">玩家2，准备好接受挑战了吗？</text>
+      </view>
+      
+      <!-- 倒计时 -->
+      <view class="countdown-section">
+        <view class="countdown-number">{{countdownNumber}}</view>
+      </view>
+      
+      <button class="start-btn" bindtap="skipSwitchProcess">立即开始 🚀</button>
     </view>
   </view>
 </view> 
