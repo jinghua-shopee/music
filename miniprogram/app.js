@@ -99,21 +99,30 @@ App({
    * 初始化音频下载
    */
   async initializeAudio() {
-    console.log('开始初始化钢琴音频...')
+    console.log('开始智能初始化钢琴音频...')
     
     this.globalData.audioDownloadStatus.isDownloading = true
     this.globalData.audioDownloadStatus.error = null
     
     try {
-      // 初始化音频下载管理器
-      await audioDownloadManager.initialize()
+      // 使用新的智能初始化功能
+      const progress = await audioDownloadManager.initialize()
       
       // 更新下载状态
       this.globalData.audioDownloadStatus.isDownloading = false
       this.globalData.audioDownloadStatus.isCompleted = true
-      this.globalData.audioDownloadStatus.progress = 100
+      this.globalData.audioDownloadStatus.progress = progress.percentage
       
-      console.log('钢琴音频初始化完成')
+      console.log('钢琴音频智能初始化完成')
+      console.log('📊 音频文件统计:', progress)
+      
+      // 如果有音频可用，预加载高优先级文件
+      if (progress.success > 0) {
+        console.log('⚡ 开始预加载高优先级音频文件...')
+        audioDownloadManager.preloadByPriority(8).catch(error => {
+          console.warn('预加载高优先级文件失败:', error)
+        })
+      }
       
       // 下载完成后删除本地audio/piano目录
       await this.cleanupLocalAudioDirectory()

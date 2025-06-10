@@ -25,8 +25,10 @@ class PianoKeyMapping {
     
     // C1 到 B7 (7个完整八度)
     for (let octave = 1; octave <= 7; octave++) {
-      for (let noteIndex = 3; noteIndex < 15; noteIndex++) { // C到B (12个音符)
-        const noteName = notes[noteIndex % 12]
+      // 每个八度包含12个音符：C, C#, D, D#, E, F, F#, G, G#, A, A#, B
+      const octaveNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+      
+      octaveNotes.forEach(noteName => {
         const noteKey = noteName.toLowerCase().replace('#', '#') + octave
         mapping[currentIndex] = {
           note: noteName + octave,
@@ -34,13 +36,35 @@ class PianoKeyMapping {
           file: `${noteKey}.mp3`
         }
         currentIndex++
-      }
+      })
     }
     
     // C8 (最高键)
     mapping[87] = { note: 'C8', key: 'c8', file: 'c8.mp3' }
     
+    console.log(`🎹 生成88键映射完成，共 ${Object.keys(mapping).length} 个音符`)
+    
+    // 验证映射正确性
+    this.validateMapping(mapping)
+    
     return mapping
+  }
+
+  // 验证映射正确性
+  validateMapping(mapping) {
+    const invalidKeys = []
+    Object.entries(mapping).forEach(([index, info]) => {
+      // 检查键名格式是否正确
+      if (!info.key.match(/^[a-g]#?[0-8]$/)) {
+        invalidKeys.push({ index, key: info.key, note: info.note })
+      }
+    })
+    
+    if (invalidKeys.length > 0) {
+      console.error('❌ 发现无效的音符键名:', invalidKeys)
+    } else {
+      console.log('✅ 音符映射验证通过')
+    }
   }
 
   // 生成反向映射 (音符名称 -> 索引)

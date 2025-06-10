@@ -105,18 +105,23 @@ class AudioManager {
     switch (this.preloadLevel) {
       case 'essential':
         notesToPreload = suggestions.essential
+        console.log('🎹 预加载核心音符 (8个):', notesToPreload)
         break
       case 'common':
         notesToPreload = Object.keys(suggestions.common)
+        console.log('🎹 预加载常用音符 (36个):', notesToPreload.slice(0, 10), '...等')
         break
       case 'extended':
         notesToPreload = Object.keys(suggestions.extended)
+        console.log('🎹 预加载扩展音符 (73个):', notesToPreload.slice(0, 10), '...等')
         break
       case 'full':
         notesToPreload = Object.keys(suggestions.full)
+        console.log('🎹 预加载全部音符 (88个):', notesToPreload.slice(0, 10), '...等')
         break
       default:
         notesToPreload = suggestions.essential
+        console.log('🎹 默认预加载核心音符:', notesToPreload)
     }
     
     // 验证音符列表
@@ -132,7 +137,7 @@ class AudioManager {
       )
     }
     
-    console.log(`📝 预加载音符数量: ${notesToPreload.length}`)
+    console.log(`📝 实际预加载音符数量: ${notesToPreload.length}`)
     
     // 分批预加载，避免一次性加载过多
     this.batchPreload(notesToPreload)
@@ -150,6 +155,7 @@ class AudioManager {
         batch.forEach(noteKey => {
           this.preloadNote(noteKey)
         })
+        console.log(`🎵 预加载批次 ${index + 1}/${batches.length} 完成`)
       }, index * delay)
     })
   }
@@ -157,22 +163,13 @@ class AudioManager {
   // 预加载单个音符
   preloadNote(noteKey) {
     return new Promise((resolve) => {
-      // 检查音频池中是否已有有效的音频实例
       if (this.audioPool.has(noteKey)) {
-        const existingAudio = this.audioPool.get(noteKey)
-        
-        // 只有当音频实例有效时才认为已预加载
-        if (existingAudio && existingAudio !== null && typeof existingAudio.play === 'function') {
-          resolve(existingAudio)
-          return
-        } else {
-          // 清除无效的音频实例
-          if (existingAudio && typeof existingAudio.destroy === 'function') {
-            existingAudio.destroy()
-          }
-          this.audioPool.delete(noteKey)
-        }
+        console.log(`音符 ${noteKey} 已预加载`)
+        resolve(this.audioPool.get(noteKey))
+        return
       }
+
+      console.log(`🎵 开始预加载音符: ${noteKey}`)
 
       // 验证音符键名格式
       if (!noteKey || typeof noteKey !== 'string' || !noteKey.match(/^[a-g]#?[0-8]$/)) {
@@ -187,17 +184,21 @@ class AudioManager {
       // 如果没有音频文件，直接标记为无音频模式
       if (!audioUrl) {
         this.audioPool.set(noteKey, null)
+        console.log(`音符 ${noteKey} 使用振动模式`)
         resolve(null)
         return
       }
 
       // 特殊处理：如果是带#号的音符且URL包含#号，先尝试创建安全副本
       if (noteKey.includes('#') && audioUrl.includes('#')) {
+        console.log(`🔧 检测到带#号音符，尝试安全处理: ${noteKey}`)
+        
         // 先尝试获取安全副本路径
         const audioDownloadManager = require('./audioDownloadManager')
         const safePath = audioDownloadManager.createSafeFileCopy(audioUrl, noteKey)
         
         if (safePath && safePath !== audioUrl) {
+          console.log(`🎯 使用安全副本路径: ${noteKey} -> ${safePath}`)
           this.preloadNoteWithUrl(noteKey, safePath).then(resolve)
           return
         }
@@ -205,11 +206,13 @@ class AudioManager {
 
       this.preloadNoteWithUrl(noteKey, audioUrl).then(resolve)
     })
-  }
+  },
 
   // 使用指定URL预加载音符
   preloadNoteWithUrl(noteKey, audioUrl) {
     return new Promise((resolve) => {
+      console.log(`🎵 音符 ${noteKey} 音频URL: ${audioUrl}`)
+
       // 创建音频实例
       const audio = wx.createInnerAudioContext()
       
@@ -224,7 +227,7 @@ class AudioManager {
       let loadTimeout = null
       let isLoaded = false
       let isResolved = false
-        
+      
       const resolveOnce = (result) => {
         if (!isResolved) {
           isResolved = true
@@ -234,6 +237,7 @@ class AudioManager {
       
       // 错误处理
       audio.onError((error) => {
+        console.warn(`音频加载失败 ${noteKey}:`, error)
         clearTimeout(loadTimeout)
         
         // 分析错误类型
@@ -244,6 +248,7 @@ class AudioManager {
           
           // 解码错误：标记为永久失败，不再重试
           this.audioPool.set(noteKey, null)
+          console.log(`⚠️ 音符 ${noteKey} 永久使用振动反馈 (解码失败)`)
           resolveOnce(null)
           return
           
@@ -259,6 +264,7 @@ class AudioManager {
         if (!isLoaded && errorType !== 'decode_error') {
           const retryCount = this.audioPool.get(noteKey + '_retry_count') || 0
           if (retryCount < 2) { // 最多重试2次
+            console.log(`🔄 尝试重新加载音符: ${noteKey} (重试 ${retryCount + 1}/2)`)
             this.audioPool.set(noteKey + '_retry_count', retryCount + 1)
             setTimeout(async () => {
               try {
@@ -275,6 +281,7 @@ class AudioManager {
             resolveOnce(null)
           }
         } else {
+          console.log(`⚠️ 音符 ${noteKey} 将使用振动反馈 (错误类型: ${errorType})`)
           this.audioPool.set(noteKey, null)
           resolveOnce(null)
         }
@@ -284,9 +291,14 @@ class AudioManager {
       audio.onCanplay(() => {
         isLoaded = true
         clearTimeout(loadTimeout)
-          
+        
         // 清除重试计数
         this.audioPool.delete(noteKey + '_retry_count')
+        
+        // 只在详细模式下记录
+        if (this.preloadLevel === 'essential') {
+          console.log(`音频预加载完成: ${noteKey}`)
+        }
         
         resolveOnce(audio)
       })
@@ -303,10 +315,12 @@ class AudioManager {
       
       this.audioPool.set(noteKey, audio)
     })
-  }
+  },
 
   // 重试预加载音符
   retryPreloadNote(noteKey) {
+    console.log(`重试预加载音符: ${noteKey}`)
+    
     // 清除旧的实例
     const oldAudio = this.audioPool.get(noteKey)
     if (oldAudio && typeof oldAudio.destroy === 'function') {
@@ -318,7 +332,7 @@ class AudioManager {
     const audioUrl = this.getAudioUrl(noteKey)
     if (!audioUrl) {
       this.audioPool.set(noteKey, null)
-      return Promise.resolve(null)
+      return
     }
 
     const audio = wx.createInnerAudioContext()
@@ -334,25 +348,23 @@ class AudioManager {
     })
     
     audio.onCanplay(() => {
-      // 静默成功
+      console.log(`音频重试成功 ${noteKey}`)
     })
     
     this.audioPool.set(noteKey, audio)
-    return Promise.resolve(audio)
-  }
+  },
 
   // 获取音频文件URL
   getAudioUrl(noteKey) {
     // 验证音符是否在88键范围内
     const noteInfo = pianoKeyMapping.getFileByNoteKey(noteKey)
     if (!noteInfo) {
-      console.warn(`❌ 无效音符: ${noteKey}`)
+      console.warn(`无效音符: ${noteKey}`)
       return null
     }
     
     // 优先使用下载的音频文件
     const localPath = audioDownloadManager.getLocalAudioPath(noteKey)
-    
     if (localPath) {
       // 验证路径是否完整（包含文件扩展名）
       if (!localPath.includes('.mp3')) {
@@ -362,22 +374,22 @@ class AudioManager {
       
       // 验证路径是否包含正确的音符名
       const expectedFileName = `${noteKey}.mp3`
-      const safeFileName = `${noteKey.replace('#', 'sharp')}.mp3`
-      
-      if (localPath.includes(expectedFileName) || localPath.includes(safeFileName)) {
-        return localPath
-      } else {
-        console.error(`❌ 音频路径不匹配: ${noteKey} 期望 ${expectedFileName} 或 ${safeFileName} 但得到 ${localPath}`)
+      if (!localPath.includes(expectedFileName)) {
+        console.error(`❌ 音频路径不匹配: ${noteKey} 期望 ${expectedFileName} 但得到 ${localPath}`)
         return null
       }
+      
+      console.log(`使用下载的音频文件: ${noteKey} -> ${localPath}`)
+      return localPath
     }
     
     // 如果没有下载的文件，直接返回null，使用振动反馈
+    console.warn(`音频文件未下载: ${noteKey}，将使用振动反馈`)
     return null
-  }
+  },
 
   // 播放音符
-  async playNote(noteKey, options = {}) {
+  playNote(noteKey, options = {}) {
     if (!this.isAudioEnabled) {
       console.log('音频已禁用')
       return
@@ -391,226 +403,415 @@ class AudioManager {
 
     const {
       volume = 0.8,
-      pitch = 1.0,
-      useVibration = true
+      duration = 500,
+      fadeOut = true,
+      retry = true
     } = options
 
-    let audio = this.audioPool.get(noteKey)
-    
-    // 如果音符未预加载或无效，动态加载
-    if (audio === undefined) {
-      try {
-        audio = await this.preloadNote(noteKey)
-      } catch (error) {
-        console.error(`❌ 动态加载音符失败 ${noteKey}:`, error)
-        audio = null
-      }
-    } else if (audio === null) {
-      try {
-        audio = await this.preloadNote(noteKey)
-      } catch (error) {
-        console.error(`❌ 重新加载音符失败 ${noteKey}:`, error)
-        audio = null
-      }
+    console.log(`播放音符: ${noteKey}`)
+
+    // 检查是否是已知的永久失败音符
+    const retryCount = this.audioPool.get(noteKey + '_retry_count') || 0
+    if (retryCount >= 2) {
+      console.log(`🚫 跳过播放永久失败的音符: ${noteKey}，直接使用振动`)
+      this.playVibrateNote(noteKey)
+      return
     }
-    
-    // 如果仍然没有音频文件，使用振动反馈
-    if (!audio || audio === null) {
-      if (useVibration) {
-        this.playVibration()
-      }
+
+    // 获取或创建音频实例
+    let audio = this.audioPool.get(noteKey)
+    if (audio === undefined) {
+      // 动态加载未预加载的音符
+      this.preloadNote(noteKey)
+      audio = this.audioPool.get(noteKey)
+    }
+
+    // 如果是null，表示使用振动模式
+    if (audio === null) {
+      this.playVibrateNote(noteKey)
+      return
+    }
+
+    // 如果仍然没有音频实例，回退到振动
+    if (!audio) {
+      console.warn(`音频实例创建失败: ${noteKey}`)
+      this.playVibrateNote(noteKey)
       return
     }
 
     try {
-      // 检查音频实例是否有效
-      if (typeof audio.play !== 'function') {
-        console.warn(`音频实例无效 ${noteKey}`)
-        if (useVibration) {
-          this.playVibration()
+      // 重置音频状态
+      audio.seek(0)
+      
+      // 设置音量
+      audio.volume = volume
+      
+      // 设置错误处理
+      audio.onError((error) => {
+        console.warn(`音频播放出错 ${noteKey}:`, error)
+        
+        // 如果是解码错误，标记为永久失败
+        if (error.errMsg && error.errMsg.includes('Unable to decode audio data')) {
+          console.log(`🚫 播放时发现解码错误，标记为永久失败: ${noteKey}`)
+          this.audioPool.set(noteKey + '_retry_count', 3) // 设置为超过重试上限
+          this.audioPool.set(noteKey, null)
+          this.playVibrateNote(noteKey)
+          return
         }
-        return
-      }
-
-      // 停止当前播放（如果正在播放）
-      audio.stop()
-      
-      // 设置音量和音调
-      audio.volume = Math.max(0, Math.min(1, volume))
-      
-      // 播放音频
-      audio.play()
-    } catch (error) {
-      console.error(`播放音符失败 ${noteKey}:`, error)
-      if (useVibration) {
-        this.playVibration()
-      }
-    }
-  }
-
-  // 播放振动反馈
-  playVibration() {
-    try {
-      wx.vibrateShort({
-        type: 'light'
+        
+        // 如果允许重试，尝试重新创建音频实例
+        if (retry && retryCount < 2) {
+          console.log(`重试播放音符: ${noteKey}`)
+          this.audioPool.delete(noteKey) // 删除有问题的实例
+          this.preloadNote(noteKey) // 重新创建
+          
+          // 递归调用，但不再重试
+          setTimeout(() => {
+            this.playNote(noteKey, { ...options, retry: false })
+          }, 100)
+        } else {
+          // 最终回退到振动
+          this.playVibrateNote(noteKey)
+        }
       })
+      
+      // 开始播放
+      audio.play()
+      
+      // 如果设置了持续时间，自动停止
+      if (duration > 0) {
+        setTimeout(() => {
+          try {
+            if (fadeOut) {
+              this.fadeOutAudio(audio, 100)
+            } else {
+              audio.stop()
+            }
+          } catch (error) {
+            console.warn(`停止音频失败 ${noteKey}:`, error)
+          }
+        }, duration)
+      }
+      
+      // 同时提供触觉反馈
+      this.playVibrateNote(noteKey)
+      
     } catch (error) {
-      console.warn('振动反馈失败:', error)
+      console.error(`播放音符异常 ${noteKey}:`, error)
+      
+      // 如果允许重试
+      if (retry && retryCount < 2) {
+        console.log(`异常重试播放音符: ${noteKey}`)
+        this.audioPool.delete(noteKey)
+        this.preloadNote(noteKey)
+        setTimeout(() => {
+          this.playNote(noteKey, { ...options, retry: false })
+        }, 100)
+      } else {
+        this.playVibrateNote(noteKey)
+      }
     }
-  }
+  },
+
+  // 重新激活音频上下文（用户交互后）
+  reactivateAudioContext() {
+    console.log('🎵 用户交互，重新激活音频上下文')
+    
+    try {
+      // 创建一个测试音频来激活上下文
+      const testAudio = wx.createInnerAudioContext()
+      testAudio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LHdSEFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBzuVz+zGbyECLHXE7+5VGQs'
+      testAudio.volume = 0
+      testAudio.play()
+      
+      testAudio.onEnded(() => {
+        testAudio.destroy()
+      })
+      
+      testAudio.onError(() => {
+        testAudio.destroy()
+      })
+      
+      // 重新加载失败的音频实例
+      this.reloadFailedAudio()
+      
+    } catch (error) {
+      console.warn('重新激活音频上下文失败:', error)
+    }
+  },
+
+  // 重新加载失败的音频实例
+  reloadFailedAudio() {
+    const failedNotes = []
+    const permanentlyFailedNotes = []
+    
+    // 找出标记为null（振动模式）的音符
+    this.audioPool.forEach((audio, noteKey) => {
+      if (audio === null) {
+        // 检查是否是永久失败的音符（解码错误等）
+        const retryCount = this.audioPool.get(noteKey + '_retry_count') || 0
+        if (retryCount >= 2) {
+          permanentlyFailedNotes.push(noteKey)
+        } else {
+          failedNotes.push(noteKey)
+        }
+      }
+    })
+    
+    if (permanentlyFailedNotes.length > 0) {
+      console.log(`🚫 跳过 ${permanentlyFailedNotes.length} 个永久失败的音频:`, permanentlyFailedNotes)
+    }
+    
+    if (failedNotes.length > 0) {
+      console.log(`🔄 重新加载 ${failedNotes.length} 个失败的音频:`, failedNotes)
+      
+      // 分类处理：带#号的音符和普通音符
+      const sharpNotes = failedNotes.filter(note => note.includes('#'))
+      const normalNotes = failedNotes.filter(note => !note.includes('#'))
+      
+      if (sharpNotes.length > 0) {
+        console.log(`🎵 特别处理 ${sharpNotes.length} 个带#号的音符:`, sharpNotes)
+      }
+      
+      failedNotes.forEach((noteKey, index) => {
+        // 延迟加载，避免同时创建太多音频实例
+        setTimeout(() => {
+          // 清理旧的实例和重试计数
+          this.audioPool.delete(noteKey)
+          this.audioPool.delete(noteKey + '_retry_count')
+          
+          // 对带#号的音符，强制重新获取安全路径
+          if (noteKey.includes('#')) {
+            console.log(`🔧 重新处理带#号音符: ${noteKey}`)
+          }
+          
+          this.preloadNote(noteKey)
+        }, index * 300) // 增加延迟时间
+      })
+    } else {
+      console.log(`✅ 没有需要重新加载的音频文件`)
+    }
+  },
+
+  // 渐出效果
+  fadeOutAudio(audio, duration = 200) {
+    const startVolume = audio.volume
+    const stepTime = 50
+    const steps = duration / stepTime
+    const volumeStep = startVolume / steps
+    
+    let currentStep = 0
+    const fadeInterval = setInterval(() => {
+      currentStep++
+      const newVolume = Math.max(0, startVolume - (volumeStep * currentStep))
+      audio.volume = newVolume
+      
+      if (currentStep >= steps || newVolume <= 0) {
+        clearInterval(fadeInterval)
+        audio.stop()
+        audio.volume = startVolume // 恢复原始音量
+      }
+    }, stepTime)
+  },
+
+  // 使用振动模拟音符（备用方案）
+  playVibrateNote(noteKey) {
+    if (!noteKey) return
+    
+    const frequency = this.noteFrequencies[noteKey] || 440
+    
+    // 根据频率调整振动模式
+    if (frequency < 130) {
+      // 极低音 - 长振动
+      wx.vibrateLong()
+    } else if (frequency < 260) {
+      // 低音 - 长振动
+      wx.vibrateLong()
+    } else if (frequency > 1000) {
+      // 高音 - 短振动
+      wx.vibrateShort()
+    } else {
+      // 中音 - 短振动
+      wx.vibrateShort()
+    }
+  },
+
+  // 播放和弦
+  playChord(noteKeys, options = {}) {
+    noteKeys.forEach((noteKey, index) => {
+      setTimeout(() => {
+        this.playNote(noteKey, options)
+      }, index * 50) // 错开50ms播放
+    })
+  },
+
+  // 播放音阶
+  playScale(noteKeys, options = {}) {
+    const { interval = 300 } = options
+    
+    noteKeys.forEach((noteKey, index) => {
+      setTimeout(() => {
+        this.playNote(noteKey, options)
+      }, index * interval)
+    })
+  },
+
+  // 设置预加载级别
+  setPreloadLevel(level) {
+    const validLevels = ['essential', 'common', 'extended', 'full']
+    if (!validLevels.includes(level)) {
+      console.warn('无效的预加载级别:', level)
+      return
+    }
+    
+    this.preloadLevel = level
+    console.log(`设置预加载级别为: ${level}`)
+    
+    // 清理当前预加载的音频
+    this.clearAudioPool()
+    
+    // 重新预加载
+    this.preloadNotesByLevel()
+  },
+
+  // 清理音频池
+  clearAudioPool() {
+    this.audioPool.forEach((audio) => {
+      if (audio && typeof audio.destroy === 'function') {
+        audio.destroy()
+      }
+    })
+    this.audioPool.clear()
+  },
 
   // 停止所有音频
   stopAll() {
     this.audioPool.forEach((audio, noteKey) => {
-      if (audio && typeof audio.stop === 'function') {
-        try {
+      try {
+        if (audio && typeof audio.stop === 'function') {
           audio.stop()
-        } catch (error) {
-          console.warn(`停止音频失败 ${noteKey}:`, error)
         }
+      } catch (error) {
+        console.warn(`停止音频失败 ${noteKey}:`, error)
       }
     })
-  }
+  },
 
-  // 销毁所有音频实例
-  destroyAll() {
-    this.audioPool.forEach((audio, noteKey) => {
-      if (audio && typeof audio.destroy === 'function') {
-        try {
-          audio.destroy()
-        } catch (error) {
-          console.warn(`销毁音频失败 ${noteKey}:`, error)
-        }
+  // 设置全局音量
+  setVolume(volume) {
+    this.audioPool.forEach((audio) => {
+      if (audio && typeof audio.volume !== 'undefined') {
+        audio.volume = Math.max(0, Math.min(1, volume))
       }
     })
-    this.audioPool.clear()
-  }
+  },
 
-  // 重新激活音频上下文
-  reactivateAudioContext() {
-    console.log('重新激活音频上下文')
-    try {
-      // 通过播放极短的静音来重新激活音频上下文
-      const audio = wx.createInnerAudioContext()
-      audio.src = 'data:audio/wav;base64,UklGRi4AAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACA'
-      audio.volume = 0
-      audio.play()
-      audio.onEnded(() => {
-        audio.destroy()
-      })
-    } catch (error) {
-      console.warn('重新激活音频上下文失败:', error)
+  // 启用/禁用音频
+  setAudioEnabled(enabled) {
+    this.isAudioEnabled = enabled
+    if (!enabled) {
+      this.stopAll()
     }
-  }
+    console.log(`音频${enabled ? '启用' : '禁用'}`)
+  },
 
-  // 报告加载状态
+  // 销毁音频管理器
+  destroy() {
+    this.stopAll()
+    this.clearAudioPool()
+    console.log('音频管理器已销毁')
+  },
+
+  // 报告音频加载状态
   reportLoadingStatus() {
-    const totalNotes = this.audioPool.size
-    let loadedCount = 0
-    let failedCount = 0
+    console.log('=== 🎹 音频加载状态报告 ===')
+    
+    let audioCount = 0
+    let vibrateCount = 0
+    const suggestions = pianoKeyMapping.getPreloadSuggestions()
     
     this.audioPool.forEach((audio, noteKey) => {
-      if (audio && audio !== null) {
-        loadedCount++
-      } else if (audio === null) {
-        failedCount++
+      if (audio === null) {
+        vibrateCount++
+      } else if (audio) {
+        audioCount++
       }
     })
     
-    console.log(`📊 音频加载状态: 总计${totalNotes}, 成功${loadedCount}, 失败${failedCount}`)
+    console.log(`📊 当前预加载级别: ${this.preloadLevel}`)
+    console.log(`📊 音频文件: ${audioCount} 个`)
+    console.log(`📊 振动模式: ${vibrateCount} 个`)
+    console.log(`📊 总计预加载: ${this.audioPool.size} 个音符`)
+    console.log(`📊 88键总数: ${Object.keys(suggestions.full).length} 个`)
     
-    return {
-      total: totalNotes,
-      loaded: loadedCount,
-      failed: failedCount,
-      successRate: totalNotes > 0 ? Math.round((loadedCount / totalNotes) * 100) : 0
+    if (audioCount > 0) {
+      console.log('🎉 音频文件加载成功！支持88键钢琴音效！')
+    } else {
+      console.log('ℹ️  当前使用振动反馈模式')
     }
-  }
+    
+    // 显示预加载级别说明
+    console.log('\n💡 预加载级别说明:')
+    console.log('- essential: 8个核心音符 (中央C区域)')
+    console.log('- common: 36个常用音符 (C3-B5)')
+    console.log('- extended: 73个扩展音符 (C2-C7)')
+    console.log('- full: 88个完整音符 (A0-C8)')
+  },
 
-  // 健康检查
+  // 获取音符信息
+  getNoteInfo(noteKey) {
+    return pianoKeyMapping.getFileByNoteKey(noteKey)
+  },
+
+  // 获取音符频率
+  getNoteFrequency(noteKey) {
+    return this.noteFrequencies[noteKey] || 440
+  },
+
+  // 健康检查和性能监控
   async performHealthCheck() {
     console.log('🔍 执行音频系统健康检查...')
     
+    const checkResult = {
+      audioContextActive: false,
+      downloadManagerHealth: null,
+      audioPoolStatus: null,
+      recommendations: []
+    }
+    
     try {
       // 1. 检查音频上下文状态
-      const audioContextActive = this.isAudioEnabled && this.hasUserInteraction
+      checkResult.audioContextActive = this.isAudioEnabled
       
       // 2. 检查下载管理器健康状态
-      let downloadManagerHealth = null
-      try {
-        const downloadProgress = audioDownloadManager.getDownloadProgress()
-        downloadManagerHealth = {
-          percentage: downloadProgress.percentage,
-          success: downloadProgress.success,
-          failed: downloadProgress.failed,
-          isHealthy: downloadProgress.percentage > 50
-        }
-      } catch (error) {
-        console.warn('下载管理器健康检查失败:', error)
-        downloadManagerHealth = {
-          percentage: 0,
-          success: 0,
-          failed: 0,
-          isHealthy: false,
-          error: error.message
-        }
-      }
+      const audioDownloadManager = require('./audioDownloadManager')
+      checkResult.downloadManagerHealth = await audioDownloadManager.performHealthCheck()
       
       // 3. 检查音频池状态
-      const audioPoolStatus = this.getAudioPoolStatus()
+      checkResult.audioPoolStatus = this.getAudioPoolStatus()
       
-      // 4. 总体健康评估
-      const overallHealthy = audioContextActive && 
-                           downloadManagerHealth.isHealthy && 
-                           audioPoolStatus.healthScore > 60
-      
-      const healthReport = {
-        timestamp: new Date().toISOString(),
-        audioContextActive,
-        downloadManagerHealth,
-        audioPoolStatus,
-        overallHealthy,
-        recommendations: this.getHealthRecommendations(audioContextActive, downloadManagerHealth, audioPoolStatus)
+      // 4. 生成建议
+      if (checkResult.downloadManagerHealth.percentage < 80) {
+        checkResult.recommendations.push('音频文件下载不完整，建议重新下载')
       }
       
-      console.log('🔍 健康检查完成:', healthReport)
-      return healthReport
+      if (checkResult.audioPoolStatus.nullCount > 10) {
+        checkResult.recommendations.push('过多音频实例创建失败，建议重新激活音频上下文')
+      }
+      
+      if (!checkResult.audioContextActive) {
+        checkResult.recommendations.push('音频上下文未激活，需要用户交互后重新激活')
+      }
+      
+      console.log('📊 音频系统健康检查完成:', checkResult)
+      return checkResult
       
     } catch (error) {
-      console.error('健康检查失败:', error)
-      return {
-        timestamp: new Date().toISOString(),
-        audioContextActive: false,
-        downloadManagerHealth: { percentage: 0, isHealthy: false, error: error.message },
-        audioPoolStatus: { healthScore: 0 },
-        overallHealthy: false,
-        error: error.message
-      }
+      console.error('音频系统健康检查失败:', error)
+      checkResult.error = error.message
+      return checkResult
     }
-  }
-
-  // 获取健康建议
-  getHealthRecommendations(audioContextActive, downloadManagerHealth, audioPoolStatus) {
-    const recommendations = []
-    
-    if (!audioContextActive) {
-      recommendations.push('需要用户交互来激活音频上下文')
-    }
-    
-    if (!downloadManagerHealth.isHealthy) {
-      recommendations.push('建议重新下载音频文件')
-    }
-    
-    if (audioPoolStatus.healthScore < 60) {
-      recommendations.push('建议重新预加载音频实例')
-    }
-    
-    if (recommendations.length === 0) {
-      recommendations.push('音频系统运行正常')
-    }
-    
-    return recommendations
-  }
+  },
 
   // 获取音频池状态
   getAudioPoolStatus() {
@@ -619,10 +820,10 @@ class AudioManager {
     let errorCount = 0
     
     this.audioPool.forEach((audio, noteKey) => {
-      if (audio && typeof audio.play === 'function') {
-        validCount++
-      } else if (audio === null) {
+      if (audio === null) {
         nullCount++
+      } else if (audio && typeof audio.play === 'function') {
+        validCount++
       } else {
         errorCount++
       }
@@ -635,7 +836,7 @@ class AudioManager {
       error: errorCount,
       healthScore: Math.round((validCount / this.audioPool.size) * 100)
     }
-  }
+  },
 
   // 智能修复音频系统
   async performSmartRepair() {
@@ -683,22 +884,7 @@ class AudioManager {
         actions: repairActions
       }
     }
-  }
-
-  // 清理音频池
-  clearAudioPool() {
-    console.log('🧹 清理音频池...')
-    this.audioPool.forEach((audio, noteKey) => {
-      if (audio && typeof audio.destroy === 'function') {
-        try {
-          audio.destroy()
-        } catch (error) {
-          console.warn(`清理音频实例失败 ${noteKey}:`, error)
-        }
-      }
-    })
-    this.audioPool.clear()
-  }
+  },
 
   // 性能监控
   getPerformanceStats() {
@@ -714,7 +900,7 @@ class AudioManager {
       timestamp: new Date().toISOString(),
       overallHealth: this.calculateOverallHealth(downloadStats, poolStatus)
     }
-  }
+  },
 
   // 计算总体健康度
   calculateOverallHealth(downloadStats, poolStatus) {
@@ -734,7 +920,7 @@ class AudioManager {
       status: status,
       issues: this.identifyIssues(downloadStats, poolStatus)
     }
-  }
+  },
 
   // 识别问题
   identifyIssues(downloadStats, poolStatus) {
@@ -757,7 +943,7 @@ class AudioManager {
     }
     
     return issues
-  }
+  },
 
   // 自动优化
   async autoOptimize() {
@@ -806,10 +992,12 @@ class AudioManager {
         optimizations: optimizations
       }
     }
-  }
+  },
 
   // 音频预热 - 确保首次点击有声音
   warmupAudio() {
+    console.log('🔥 开始音频预热...')
+    
     // 延迟500ms后开始预热，确保下载管理器已初始化
     setTimeout(() => {
       // 预热最常用的几个音符
@@ -818,9 +1006,11 @@ class AudioManager {
       warmupNotes.forEach((noteKey, index) => {
         setTimeout(() => {
           this.preloadNote(noteKey).then((audio) => {
-            // 静默预热
+            if (audio && audio !== null) {
+              console.log(`🎹 预热完成: ${noteKey}`)
+            }
           }).catch(error => {
-            // 静默失败
+            console.log(`⚠️ 预热失败: ${noteKey}`, error)
           })
         }, index * 100) // 错开100ms
       })

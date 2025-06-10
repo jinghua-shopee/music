@@ -2,6 +2,20 @@
   <view class="learning-content">
     <text class="title"> {{pageTitle}}</text>
     
+    <!-- 音频系统健康状态指示器 -->
+    <view class="audio-health-indicator" wx:if="{{!audioSystemHealth.isHealthy}}">
+      <view class="health-warning">
+        <text class="warning-icon">🔧</text>
+        <text class="warning-text">正在优化音频，暂时使用振动反馈</text>
+        <button class="btn-repair" bindtap="manualRepairAudio">立即修复</button>
+      </view>
+      <view class="health-issues" wx:if="{{audioSystemHealth.issues.length > 0}}">
+        <view wx:for="{{audioSystemHealth.issues}}" wx:key="index" class="issue-item">
+          <text class="issue-text">• {{item}}</text>
+        </view>
+      </view>
+    </view>
+    
     <!-- 游戏信息 -->
     <view class="game-info card">
       <view class="info-row">

@@ -173,14 +173,15 @@ Component({
     },
 
     // 播放按键音效
-    playKeySound(key) {
+    async playKeySound(key) {
       if (!key) return
       
-      // 使用音频管理器播放音符
-      audioManager.playNote(key, {
+      console.log(`准备播放钢琴音符: ${key}`)
+      
+      // 使用音频管理器播放音符（现在支持动态加载）
+      await audioManager.playNote(key, {
         volume: 0.8,
-        duration: 800,
-        fadeOut: true
+        useVibration: true
       })
       
       console.log(`播放钢琴音符: ${key}`)

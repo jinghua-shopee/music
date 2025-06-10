@@ -38,7 +38,7 @@
         <button class="btn btn-secondary retry-btn" bindtap="retryAudioDownload">重新下载音频</button>
       </view>
     </view>
-    
+
     <!-- 模式选择区域 -->
     <view class="mode-selection">
       <text class="section-title">选择学习模式</text>

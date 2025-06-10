@@ -4,6 +4,76 @@
   margin: 0 auto;
 }
 
+/* 音频系统健康状态指示器 */
+.audio-health-indicator {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 32rpx;
+  animation: attention 3s ease-in-out infinite;
+}
+
+@keyframes attention {
+  0%, 100% { 
+    box-shadow: 0 4rpx 12rpx rgba(255, 193, 7, 0.2);
+  }
+  50% { 
+    box-shadow: 0 8rpx 24rpx rgba(255, 193, 7, 0.4);
+  }
+}
+
+.health-warning {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.warning-icon {
+  font-size: 32rpx;
+  min-width: 32rpx;
+}
+
+.warning-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #856404;
+  font-weight: 500;
+}
+
+.btn-repair {
+  background: #ffc107;
+  color: #212529;
+  border: 1px solid #ffc107;
+  border-radius: 12rpx;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-repair:active {
+  background: #e0a800;
+  border-color: #d39e00;
+  transform: translateY(1rpx);
+}
+
+.health-issues {
+  border-top: 1px solid #ffeaa7;
+  padding-top: 16rpx;
+}
+
+.issue-item {
+  margin: 4rpx 0;
+}
+
+.issue-text {
+  font-size: 24rpx;
+  color: #856404;
+  line-height: 1.4;
+}
+
 /* 游戏信息 */
 .game-info {
   margin-bottom: 40rpx;

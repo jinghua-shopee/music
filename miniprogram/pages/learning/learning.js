@@ -50,13 +50,30 @@ Page({
       isCompleted: false,
       progress: 0,
       error: null
-    }
+    },
+
+    // 音频系统健康状态
+    audioSystemHealth: {
+      isHealthy: true,
+      lastCheck: null,
+      issues: []
+    },
+
+    // 音频预加载相关状态
+    audioPreloadStartTime: null,
+    isAudioPreloading: false
   },
 
   onLoad() {
     console.log('学习页面加载')
     this.initPageData()
     this.checkAudioDownloadStatus()
+    
+    // 启动音频健康监控
+    this.initAudioHealthMonitoring()
+    
+    // 快速预加载核心音频
+    this.quickPreloadAudio()
   },
 
   onShow() {
@@ -68,7 +85,261 @@ Page({
       app.generateNewNote()
     }
     
+    // 检查音频系统健康状态
+    this.checkAudioSystemHealthOnShow()
+    
+    // 确保音频系统准备就绪
+    this.ensureAudioReady()
+    
     this.updateData()
+  },
+
+  onHide() {
+    console.log('学习页面隐藏')
+    // 记录隐藏时间，用于判断是否需要重新检查音频
+    this.hideTime = Date.now()
+  },
+
+  onUnload() {
+    // 清理定时器
+    if (this.healthCheckTimer) {
+      clearInterval(this.healthCheckTimer)
+    }
+  },
+
+  /**
+   * 初始化音频健康监控
+   */
+  initAudioHealthMonitoring() {
+    console.log('🎵 启动学习页面音频健康监控')
+    
+    // 立即检查一次
+    this.performAudioHealthCheck()
+    
+    // 定期检查（每2分钟）
+    this.healthCheckTimer = setInterval(() => {
+      this.performAudioHealthCheck()
+    }, 120000)
+  },
+
+  /**
+   * 页面显示时检查音频系统
+   */
+  async checkAudioSystemHealthOnShow() {
+    const now = Date.now()
+    
+    // 如果距离上次隐藏超过30秒，执行全面健康检查
+    if (this.hideTime && (now - this.hideTime) > 30000) {
+      console.log('🔍 长时间切换后检查音频系统健康...')
+      
+      try {
+        await this.performComprehensiveHealthCheck()
+        
+        // 测试播放一个音符来验证音频是否正常
+        await this.testAudioPlayback()
+        
+      } catch (error) {
+        console.error('音频系统健康检查失败:', error)
+        this.handleAudioSystemFailure()
+      }
+    }
+  },
+
+  /**
+   * 执行全面的音频健康检查
+   */
+  async performComprehensiveHealthCheck() {
+    console.log('🔍 执行全面音频健康检查...')
+    
+    try {
+      // 1. 检查音频工具健康状态
+      const healthCheck = await audioManager.performHealthCheck()
+      
+      // 2. 检查下载管理器状态
+      const audioDownloadManager = require('../../utils/audioDownloadManager')
+      const downloadProgress = await audioDownloadManager.performHealthCheck()
+      
+      // 3. 更新健康状态 - 只有在严重问题时才显示给用户
+      const isHealthy = healthCheck.audioContextActive && 
+                       downloadProgress.percentage > 30 &&  // 降低阈值，只有严重问题才显示
+                       healthCheck.audioPoolStatus.healthScore > 20
+      
+      this.setData({
+        audioSystemHealth: {
+          isHealthy: isHealthy,
+          lastCheck: new Date().toLocaleTimeString(),
+          issues: isHealthy ? [] : ['音频暂时不可用，正在自动修复...']
+        }
+      })
+      
+      // 4. 如果不健康，自动修复
+      if (!isHealthy) {
+        console.log('🔧 音频系统存在严重问题，启动自动修复...')
+        await this.autoRepairAudioSystem()
+      }
+      
+      return isHealthy
+      
+    } catch (error) {
+      console.error('全面健康检查失败:', error)
+      throw error
+    }
+  },
+
+  /**
+   * 定期音频健康检查
+   */
+  async performAudioHealthCheck() {
+    try {
+      const audioDownloadManager = require('../../utils/audioDownloadManager')
+      const progress = audioDownloadManager.getDownloadProgress()
+      
+      const isHealthy = progress.percentage > 70 && audioManager.isAudioEnabled
+      
+      this.setData({
+        'audioSystemHealth.isHealthy': isHealthy,
+        'audioSystemHealth.lastCheck': new Date().toLocaleTimeString()
+      })
+      
+      // 如果不健康，记录问题
+      if (!isHealthy) {
+        const issues = []
+        if (progress.percentage < 70) issues.push('音频文件不完整')
+        if (!audioManager.isAudioEnabled) issues.push('音频上下文未激活')
+        
+        this.setData({
+          'audioSystemHealth.issues': issues
+        })
+      }
+      
+    } catch (error) {
+      console.error('定期健康检查失败:', error)
+    }
+  },
+
+  /**
+   * 测试音频播放
+   */
+  async testAudioPlayback() {
+    return new Promise((resolve, reject) => {
+      console.log('🎵 测试音频播放...')
+      
+      try {
+        // 测试播放当前音符或默认音符
+        const testNoteKey = this.data.currentNote?.pianoKey || 'c4'
+        
+        // 设置测试超时
+        const testTimeout = setTimeout(() => {
+          console.warn('音频播放测试超时')
+          reject(new Error('音频播放测试超时'))
+        }, 3000)
+        
+        // 尝试播放音符
+        audioManager.playNote(testNoteKey, {
+          volume: 0.1, // 低音量测试
+          duration: 100 // 短时间播放
+        })
+        
+        // 播放成功
+        clearTimeout(testTimeout)
+        console.log('✅ 音频播放测试成功')
+        resolve()
+        
+      } catch (error) {
+        console.error('音频播放测试失败:', error)
+        reject(error)
+      }
+    })
+  },
+
+  /**
+   * 自动修复音频系统
+   */
+  async autoRepairAudioSystem() {
+    console.log('🔧 开始自动修复音频系统...')
+    
+    try {
+      // 1. 重新激活音频上下文
+      audioManager.reactivateAudioContext()
+      
+      // 2. 执行音频管理器的自动优化
+      const result = await audioManager.autoOptimize()
+      
+      if (result.success) {
+        console.log('✅ 音频系统自动修复成功:', result.optimizations)
+        
+        // 显示修复成功提示
+        wx.showToast({
+          title: '音频系统已修复',
+          icon: 'success',
+          duration: 2000
+        })
+        
+        // 更新健康状态
+        this.setData({
+          'audioSystemHealth.isHealthy': true,
+          'audioSystemHealth.issues': []
+        })
+        
+      } else {
+        console.error('音频系统自动修复失败:', result.error)
+        this.handleAudioSystemFailure()
+      }
+      
+    } catch (error) {
+      console.error('自动修复过程出错:', error)
+      this.handleAudioSystemFailure()
+    }
+  },
+
+  /**
+   * 处理音频系统故障
+   */
+  handleAudioSystemFailure() {
+    console.warn('⚠️ 音频系统故障，切换到振动模式')
+    
+    this.setData({
+      'audioSystemHealth.isHealthy': false,
+      'audioSystemHealth.issues': ['音频系统不可用，使用振动反馈']
+    })
+    
+    // 显示提示
+    wx.showToast({
+      title: '音频不可用，将使用振动反馈',
+      icon: 'none',
+      duration: 3000
+    })
+  },
+
+  /**
+   * 手动修复音频系统
+   */
+  async manualRepairAudio() {
+    wx.showLoading({
+      title: '正在修复音频系统...',
+      mask: true
+    })
+    
+    try {
+      await this.autoRepairAudioSystem()
+      
+      // 测试播放
+      await this.testAudioPlayback()
+      
+      wx.hideLoading()
+      wx.showToast({
+        title: '音频系统修复成功',
+        icon: 'success'
+      })
+      
+    } catch (error) {
+      wx.hideLoading()
+      wx.showModal({
+        title: '修复失败',
+        content: '音频系统修复失败，将继续使用振动反馈。您可以尝试重新进入页面。',
+        showCancel: false
+      })
+    }
   },
 
   // 初始化页面数据
@@ -451,6 +722,93 @@ Page({
         icon: 'none',
         duration: 3000
       })
+    }
+  },
+
+  /**
+   * 快速预加载核心音频（在页面加载时立即执行）
+   */
+  async quickPreloadAudio() {
+    console.log('🚀 快速预加载核心音频...')
+    
+    try {
+      // 检查音频下载管理器是否已初始化
+      const audioDownloadManager = require('../../utils/audioDownloadManager')
+      if (!audioDownloadManager.isInitialized) {
+        console.log('⏳ 等待音频下载管理器初始化...')
+        // 等待最多3秒
+        for (let i = 0; i < 30; i++) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+          if (audioDownloadManager.isInitialized) {
+            console.log('✅ 音频下载管理器已就绪')
+            break
+          }
+        }
+      }
+      
+      // 立即预加载最常用的几个音符
+      const coreNotes = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
+      console.log('🎹 立即预加载核心音符:', coreNotes)
+      
+      coreNotes.forEach((noteKey, index) => {
+        setTimeout(() => {
+          audioManager.preloadNote(noteKey)
+        }, index * 50) // 错开50ms预加载
+      })
+      
+      // 标记音频预加载状态
+      this.audioPreloadStartTime = Date.now()
+      this.isAudioPreloading = true
+      
+      // 2秒后标记为完成
+      setTimeout(() => {
+        this.isAudioPreloading = false
+        console.log('✅ 核心音频预加载完成')
+      }, 2000)
+      
+    } catch (error) {
+      console.error('快速预加载音频失败:', error)
+    }
+  },
+
+  /**
+   * 确保音频系统准备就绪
+   */
+  async ensureAudioReady() {
+    console.log('🔍 检查音频系统就绪状态...')
+    
+    try {
+      // 1. 检查音频管理器状态
+      if (!audioManager.isAudioEnabled) {
+        console.log('🔄 重新激活音频上下文...')
+        audioManager.reactivateAudioContext()
+      }
+      
+      // 2. 如果还在预加载中，等待一下
+      if (this.isAudioPreloading) {
+        const waitTime = Date.now() - (this.audioPreloadStartTime || 0)
+        if (waitTime < 2000) {
+          console.log('⏳ 等待音频预加载完成...')
+          await new Promise(resolve => setTimeout(resolve, Math.max(500, 2000 - waitTime)))
+        }
+      }
+      
+      // 3. 检查核心音符是否已预加载
+      const coreNote = 'c4'
+      const audio = audioManager.audioPool.get(coreNote)
+      
+      if (!audio) {
+        console.log('🎵 立即预加载测试音符...')
+        audioManager.preloadNote(coreNote)
+        
+        // 等待500ms确保音频加载
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+      
+      console.log('✅ 音频系统就绪检查完成')
+      
+    } catch (error) {
+      console.error('音频系统就绪检查失败:', error)
     }
   }
 }) 
